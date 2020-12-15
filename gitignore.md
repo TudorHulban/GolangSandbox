@@ -1,21 +1,22 @@
 ```
-# Binaries for Debian
+# Binaries for programs and plugins
 *
 !*/
 !*.*
-
-# Binaries for programs and plugins
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
 
-# Test binary, build with `go test -c`
+# Test binary, built with `go test -c`
 *.test
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
 
 # "Always use a slice.", Dave Cheney
 ```
