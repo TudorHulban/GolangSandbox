@@ -1,0 +1,39 @@
+/*
+	max1, errMax1 := blog.GetMaxIDUsers()
+	log.Println("errMax:", errMax1)
+	log.Println(max1)
+
+	max2, errMax2 := blog.GetMaxIDPosts()
+	log.Println("errMax:", errMax2)
+	log.Println(max2)
+
+	p1 := Post{Id: max2 + 1, Title: "Title P1", Contents: "Contents P1", AuthorId: 25}
+	errPost := blog.AddPost(&p1)
+	log.Println("errPost", errPost)
+
+	po, errGet := blog.GetUserPosts(25, 2)
+	log.Println("errGet", errGet)
+	log.Println("posts:", po)
+
+u1 := User{Id: (max + 1), Name: "John", Emails: []string{"e1@x.com"}}
+		u2 := User{Id: (max + 2), Name: "Mary", Emails: []string{"e2@x.com", "e3@x.com"}}
+
+		errAdd1 := blog.AddUser(&u1)
+		log.Println("errAdd1:", errAdd1)
+		errAdd2 := blog.AddUser(&u2)
+		log.Println("errAdd2:", errAdd2)
+
+	u3 := User{Id: 25, Name: "Mary Jo", Emails: []string{"e2@x.com", "e3@x.com"}}
+	blog.UpdateUser(&u3)
+	u, _ := blog.GetUser(25)
+	log.Println("u2 updated", u)
+
+	users, errUsers := blog.GetAllUsers()
+	log.Println("errUsers", errUsers)
+	log.Println(users)
+
+	user, errID := blog.GetUser(9)
+	log.Println("errID", errID)
+	log.Println("ID", user)
+
+*/

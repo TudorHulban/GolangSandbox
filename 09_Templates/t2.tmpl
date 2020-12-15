@@ -1,0 +1,11 @@
+
+hi {{.Name}}!
+your age is {{.Age}}.
+
+Tasks: {{.Tasks}}
+{{range $task := .Tasks}}
+task: "{{$task}}",{{end}}
+
+{{range .Tasks}}
+also: {{.}}{{end}}
+

@@ -1,0 +1,30 @@
+CREATE OR REPLACE FUNCTION public.mocktable(atablename character, arows integer)
+ RETURNS integer
+ LANGUAGE plpgsql
+AS $function$
+declare 
+i integer := 0;
+randstring char(16) := '';
+
+begin
+execute 'create table ' || ATableName ||'(ID bigserial PRIMARY KEY NOT NULL,DESCRIPTION TEXT NOT NULL);';
+
+if ARows > 0 then 
+loop 
+exit when i = ARows;
+i:= i + 1;
+
+randstring:= array_to_string(array(select substr('ABCDEFGHIJKLMNPQRSTUVWXYZ123456789',((random()*(36-1)+1)::integer),1) from generate_series(1,16)),'');
+
+execute 'insert into ' || ATableName || '(description) values ('|| randstring || ')';
+end loop;
+end if;
+	
+return i;
+
+end; $function$
+
+note:
+1. because serial is used a sequence would be created
+2. in insert if ID is missing the sequence next value would be used
+3. sequence would be dropped when column dropped

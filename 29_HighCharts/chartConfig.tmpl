@@ -1,0 +1,48 @@
+{
+	"chart":{
+		"marginRight": 30,
+		"plotBorderWidth": 1
+	},
+   "colors":[
+      "#8A2BE2",
+      "#A52A2A",
+      "#6495ED"
+   ],
+   "title":{
+      "text":"{{.Title}}",
+      "style":{
+         "font-weight":"500"
+      }
+   },
+   "xAxis":{
+      "labels":{
+         "style":{
+            "font-weight":"800"
+         }
+      }
+   },
+   "yAxis":{
+      "labels":{
+         "style":{
+            "font-weight":"800"
+         }
+      },
+      "tickAmount":"8",
+      "gridLineColor":"#197F07",
+      "alternateGridColor":"#FDFFD5",
+      "title":{
+         "text":"{{.YAxisTitle}}"
+      },
+      "plotLines":[
+         {
+            "color":"red",
+            "value":50,
+            "width":1,
+            "label":{
+            	"text":"label"
+            }
+         }
+      ]
+   },
+   "series":[{{.PreparedSeries}}]
+}

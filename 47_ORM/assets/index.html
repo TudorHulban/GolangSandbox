@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title></title>
+  </head>
+  <body>
+    <div id="D1"></div>
+    <div id="D2">div 2 text</div>
+
+    <script src="https://unpkg.com/mithril/mithril.js"></script>
+    <script>
+      m.request({
+        method: 'GET',
+        url: '/users',
+      })
+        .then(function(users) {
+          console.log(users[0]);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+
+      var root = document.getElementById('D1');
+      let p1 = {
+        view: function() {
+          return m('a', {href: '#!/hi'}, 'Page 1');
+        },
+      };
+
+      let p2 = {
+        view: function() {
+          return m('a', {href: '#!/hi'}, 'Page 2');
+        },
+      };
+
+      let p3 = {
+        view: function() {
+          return m('main', [
+            m('a', {href: '#!/p1'}, 'P1'),
+            m('a', {href: '#!/p2'}, 'P2'),
+          ]);
+        },
+      };
+
+      m.route(root, '/p3', {
+        '/p1': p1,
+        '/p2': p2,
+        '/p3': p3,
+      });
+    </script>
+  </body>
+</html>

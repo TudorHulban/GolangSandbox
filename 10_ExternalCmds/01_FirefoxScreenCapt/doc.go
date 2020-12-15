@@ -1,0 +1,5 @@
+/*
+package main Can be used to create screen captures of URLs.
+Works with firefox in headless mode.
+Passes race tests.
+*/
