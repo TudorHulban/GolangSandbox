@@ -3,18 +3,19 @@ package main
 import (
 	"strconv"
 
-	"github.com/go-pg/pg"
-	"github.com/go-pg/pg/orm"
+	"gorm.io/gorm"
 )
 
 // Author Structure consolidating user that writes blogs information.
 type Author struct {
+	gorm.Model
 	Id     int64
 	Name   string
 	Emails []string
 }
 
 type Post struct {
+	gorm.Model
 	Id              int64
 	AuthorId        int64
 	CreatedTimeUnix int64
@@ -25,50 +26,43 @@ type Post struct {
 
 type Blog struct {
 	postsPerPage uint
-	DBConn       *pg.DB
+	DBConn       *gorm.DB
 }
 
-func NewBlog(db *pg.DB) (*Blog, error) {
+func NewBlog(db *gorm.DB) (*Blog, error) {
 	result := &Blog{
 		postsPerPage: 5,
 		DBConn:       db,
 	}
 
-	errUsers := result.CreateTable4Model(interface{}(&Author{}))
-	if errUsers != nil {
-		return nil, errUsers
+	errAuthors := db.AutoMigrate(&Author{})
+	if errAuthors != nil {
+		return nil, errAuthors
 	}
-	errPosts := result.CreateTable4Model(interface{}(&Post{}))
+	errPosts := db.AutoMigrate(&Post{})
 	if errPosts != nil {
 		return nil, errPosts
 	}
 	return result, nil
 }
 
-func (b *Blog) CreateTable4Model(model interface{}) error {
-	return b.DBConn.CreateTable(model, &orm.CreateTableOptions{Temp: false, IfNotExists: true})
-}
-
 func (b *Blog) AddAuthor(a *Author) error {
-	return b.DBConn.Insert(a)
+	return b.DBConn.Create(a).Error
 }
 
 func (b *Blog) GetAuthor(id int64) (Author, error) {
 	result := Author{Id: id}
-
-	errSelect := b.DBConn.Select(&result)
-	return result, errSelect
+	return result, b.DBConn.Select(&result).Error
 }
 
 func (b *Blog) UpdateAuthor(a *Author) error {
-	return b.DBConn.Update(a)
+	return b.DBConn.Model(a).Updates(*a).Error
 }
 
 func (b *Blog) GetAllAuthors() ([]Author, error) {
 	var result []Author
 
-	errSelect := b.DBConn.Model(&result).Select()
-	return result, errSelect
+	return result, b.DBConn.Find(&result).Error
 }
 
 func (b *Blog) GetMaxIDUsers() (int64, error) {
@@ -76,12 +70,11 @@ func (b *Blog) GetMaxIDUsers() (int64, error) {
 		Max int64
 	}
 
-	_, errQuery := b.DBConn.QueryOne(&maxID, "select max(id) from authors")
-	return maxID.Max, errQuery
+	return maxID.Max, b.DBConn.Raw("select max(id) from authors").Scan(&maxID).Error
 }
 
 func (b *Blog) AddPost(p *Post) error {
-	return b.DBConn.Insert(p)
+	return b.DBConn.Create(p).Error
 }
 
 func (b *Blog) GetPost(id int64) (Post, error) {
@@ -89,12 +82,11 @@ func (b *Blog) GetPost(id int64) (Post, error) {
 		Id: id,
 	}
 
-	errSelect := b.DBConn.Select(&result)
-	return result, errSelect
+	return result, b.DBConn.Select(&result).Error
 }
 
 func (b *Blog) UpdatePost(p *Post) error {
-	return b.DBConn.Update(p)
+	return b.DBConn.Model(p).Updates(*p).Error
 }
 
 // GetUserPosts fetches posts for specific user, reverse order, latest first.
@@ -108,8 +100,7 @@ func (b *Blog) GetPosts(authorID, noPosts int64) ([]Post, error) {
 		sql = "select * from posts where author_id = ? order by 1 desc limit " + strconv.FormatInt(int64(b.postsPerPage), 10)
 	}
 
-	_, errSelect := b.DBConn.Query(&result, sql, authorID)
-	return result, errSelect
+	return result, b.DBConn.Raw(sql, authorID).Scan(&result).Error
 }
 
 // GetLatestPosts fetches last posts from all authors, reverse order, latest first.
@@ -123,14 +114,13 @@ func (b *Blog) GetLatestPosts(noPosts int64) ([]Post, error) {
 		sql = "select * from posts order by 1 desc limit " + strconv.FormatInt(int64(b.postsPerPage), 10)
 	}
 
-	_, errSelect := b.DBConn.Query(&result, sql, "")
-	return result, errSelect
+	return result, b.DBConn.Raw(sql, "").Scan(&result).Error
 }
 
 func (b *Blog) GetMaxIDPosts() (int64, error) {
 	var maxID struct {
 		Max int64
 	}
-	_, errQuery := b.DBConn.QueryOne(&maxID, "select max(id) from posts")
-	return maxID.Max, errQuery
+
+	return maxID.Max, b.DBConn.Raw("select max(id) from posts", "").Scan(&maxID).Error
 }

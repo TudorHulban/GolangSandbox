@@ -1,39 +1,36 @@
 package main
 
 import (
+	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 
-	"github.com/go-pg/pg"
 	"github.com/labstack/echo"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
-const {
+const (
 	endpointAuthors = "/authors"
-	endpointPosts = "/posts"
-}
+	endpointPosts   = "/posts"
+)
 
 var _blog *Blog
-var db *pg.DB
-
-func init() {
-	db = pg.Connect(&pg.Options{
-		User:     "postgres",
-		Password: "pp",
-		Database: "test01",
-	})
-
-	var errCreate error
-	_blog, errCreate = NewBlog(db)
-	if errCreate != nil {
-		os.Exit(1)
-	}
-}
+var _db *gorm.DB
 
 func main() {
-	defer db.Close()
+	var errOpen error
+	_db, errOpen = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	if errOpen != nil {
+		log.Fatalf("could not connect to database")
+	}
+
+	var errCreate error
+	_blog, errCreate = NewBlog(_db)
+	if errCreate != nil {
+		log.Fatalf("could not create blog: %s", errCreate)
+	}
 
 	e := echo.New()
 	e.HideBanner = true
@@ -41,8 +38,8 @@ func main() {
 	//e.GET("/", hLanding)
 	e.POST(endpointAuthors, saveUser)
 	e.GET(endpointAuthors, getAuthors)
-	e.GET(endpointAuthors + "/:id", hGetUser)
-	e.GET(endpointAuthors+"/:id" + endpointPosts+"/:no", getPosts)
+	e.GET(endpointAuthors+"/:id", getAuthor)
+	e.GET(endpointAuthors+"/:id"+endpointPosts+"/:no", getPosts)
 	e.Logger.Fatal(e.Start(":1323"))
 }
 
