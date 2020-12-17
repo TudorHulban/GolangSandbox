@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo"
 )
 
-var blog *Blog
+var _blog *Blog
 var db *pg.DB
 
 func init() {
@@ -21,7 +21,7 @@ func init() {
 	})
 
 	var errCreate error
-	blog, errCreate = NewBlog(db)
+	_blog, errCreate = NewBlog(db)
 	if errCreate != nil {
 		os.Exit(1)
 	}
@@ -34,7 +34,7 @@ func main() {
 	e.HideBanner = true
 	e.Static("/", "assets")
 	//e.GET("/", hLanding)
-	e.POST("/users", hSaveUser)
+	e.POST("/users", saveUser)
 	e.GET("/users", hGetUsers)
 	e.GET("/users/:id", hGetUser)
 	e.GET("/users/:id/posts/:no", hGetPosts)
@@ -45,15 +45,17 @@ func hLanding(c echo.Context) error {
 	return c.String(http.StatusOK, "Landing page ...")
 }
 
-func hSaveUser(c echo.Context) error {
-	var u User
-	u.Name = c.FormValue("name")
-	emails := c.FormValue("email")
-	u.Emails = strings.Split(emails, ";")
-	errAdd := blog.AddUser(&u)
+func saveUser(c echo.Context) error {
+	u := &Author{
+		Name:   c.FormValue("name"),
+		Emails: strings.Split(c.FormValue("email"), ";"),
+	}
+
+	errAdd := _blog.AddAuthor(u)
 	if errAdd != nil {
 		return c.String(http.StatusInternalServerError, errAdd.Error())
 	}
+
 	return c.String(http.StatusOK, "OK")
 }
 
@@ -62,6 +64,7 @@ func hGetPosts(c echo.Context) error {
 	if errParse != nil {
 		return c.String(http.StatusBadRequest, "Bad user ID "+c.Param("id"))
 	}
+
 	_, errGet := blog.GetUser(userID)
 	if errGet != nil {
 		return c.String(http.StatusNotFound, "User ID "+c.Param("id")+" not found.")
