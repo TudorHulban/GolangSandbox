@@ -10,6 +10,11 @@ import (
 	"github.com/labstack/echo"
 )
 
+const {
+	endpointAuthors = "/authors"
+	endpointPosts = "/posts"
+}
+
 var _blog *Blog
 var db *pg.DB
 
@@ -34,10 +39,10 @@ func main() {
 	e.HideBanner = true
 	e.Static("/", "assets")
 	//e.GET("/", hLanding)
-	e.POST("/users", saveUser)
-	e.GET("/users", hGetUsers)
-	e.GET("/users/:id", hGetUser)
-	e.GET("/users/:id/posts/:no", hGetPosts)
+	e.POST(endpointAuthors, saveUser)
+	e.GET(endpointAuthors, getAuthors)
+	e.GET(endpointAuthors + "/:id", hGetUser)
+	e.GET(endpointAuthors+"/:id" + endpointPosts+"/:no", getPosts)
 	e.Logger.Fatal(e.Start(":1323"))
 }
 
@@ -59,24 +64,27 @@ func saveUser(c echo.Context) error {
 	return c.String(http.StatusOK, "OK")
 }
 
-func hGetPosts(c echo.Context) error {
-	userID, errParse := strconv.ParseInt(c.Param("id"), 10, 64)
+func getPosts(c echo.Context) error {
+	authorID, errParse := strconv.ParseInt(c.Param("id"), 10, 64)
 	if errParse != nil {
 		return c.String(http.StatusBadRequest, "Bad user ID "+c.Param("id"))
 	}
 
-	_, errGet := blog.GetUser(userID)
+	_, errGet := _blog.GetAuthor(authorID)
 	if errGet != nil {
-		return c.String(http.StatusNotFound, "User ID "+c.Param("id")+" not found.")
+		return c.String(http.StatusNotFound, "Author ID "+c.Param("id")+" not found.")
 	}
+
 	noPosts, errParse := strconv.ParseInt(c.Param("no"), 10, 64)
 	if errParse != nil {
 		return c.String(http.StatusBadRequest, "Bad number of posts "+c.Param("no"))
 	}
-	posts, errGetPosts := blog.GetUserPosts(userID, noPosts)
+
+	posts, errGetPosts := _blog.GetPosts(authorID, noPosts)
 	if errGetPosts != nil {
 		return c.String(http.StatusInternalServerError, errGetPosts.Error())
 	}
+
 	var result string
 	for _, v := range posts {
 		result = result + "," + v.Title
@@ -84,29 +92,31 @@ func hGetPosts(c echo.Context) error {
 	return c.String(http.StatusOK, result[1:])
 }
 
-func hGetUsers(c echo.Context) error {
-	users, errGetUsers := blog.GetAllUsers()
+func getAuthors(c echo.Context) error {
+	authors, errGetUsers := _blog.GetAllAuthors()
 	if errGetUsers != nil {
 		return c.String(http.StatusInternalServerError, errGetUsers.Error())
 	}
-	if len(users) == 0 {
+	if len(authors) == 0 {
 		return c.String(http.StatusNotFound, "No users.")
 	}
+
 	var result string
-	for _, v := range users {
+	for _, v := range authors {
 		result = result + "," + v.Name
 	}
 	return c.String(http.StatusOK, result[1:])
 }
 
-func hGetUser(c echo.Context) error {
-	userID, errParse := strconv.ParseInt(c.Param("id"), 10, 64)
+func getAuthor(c echo.Context) error {
+	authorID, errParse := strconv.ParseInt(c.Param("id"), 10, 64)
 	if errParse != nil {
 		return c.String(http.StatusBadRequest, "Bad user ID "+c.Param("id"))
 	}
-	user, errGet := blog.GetUser(userID)
+
+	author, errGet := _blog.GetAuthor(authorID)
 	if errGet != nil {
-		return c.String(http.StatusNotFound, "User ID "+c.Param("id")+" not found.")
+		return c.String(http.StatusNotFound, "Author ID "+c.Param("id")+" not found.")
 	}
-	return c.String(http.StatusOK, user.Name)
+	return c.String(http.StatusOK, author.Name)
 }
