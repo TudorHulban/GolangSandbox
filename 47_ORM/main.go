@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/labstack/echo"
+	"github.com/gofiber/fiber/v2"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -21,7 +21,7 @@ var _db *gorm.DB
 
 func main() {
 	var errOpen error
-	_db, errOpen = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	_db, errOpen = gorm.Open(sqlite.Open("test.dbf"), &gorm.Config{})
 	if errOpen != nil {
 		log.Fatalf("could not connect to database")
 	}
@@ -32,22 +32,23 @@ func main() {
 		log.Fatalf("could not create blog: %s", errCreate)
 	}
 
-	e := echo.New()
-	e.HideBanner = true
-	e.Static("/", "assets")
+	webServer := fiber.New()
+
+	webServer.Static("/", "assets")
 	//e.GET("/", hLanding)
-	e.POST(endpointAuthors, saveUser)
-	e.GET(endpointAuthors, getAuthors)
-	e.GET(endpointAuthors+"/:id", getAuthor)
-	e.GET(endpointAuthors+"/:id"+endpointPosts+"/:no", getPosts)
-	e.Logger.Fatal(e.Start(":1323"))
+	webServer.Post(endpointAuthors, saveUser)
+	webServer.Get(endpointAuthors, getAuthors)
+	webServer.Get(endpointAuthors+"/:id", getAuthor)
+	webServer.Get(endpointAuthors+"/:id"+endpointPosts+"/:no", getPosts)
+
+	webServer.Listen(":8080")
 }
 
-func hLanding(c echo.Context) error {
-	return c.String(http.StatusOK, "Landing page ...")
+func hLanding(c *fiber.Ctx) error {
+	return c.SendString("Landing page ...")
 }
 
-func saveUser(c echo.Context) error {
+func saveUser(c *fiber.Ctx) error {
 	u := &Author{
 		Name:   c.FormValue("name"),
 		Emails: strings.Split(c.FormValue("email"), ";"),
@@ -55,65 +56,65 @@ func saveUser(c echo.Context) error {
 
 	errAdd := _blog.AddAuthor(u)
 	if errAdd != nil {
-		return c.String(http.StatusInternalServerError, errAdd.Error())
+		return c.SendStatus(http.StatusInternalServerError)
 	}
 
-	return c.String(http.StatusOK, "OK")
+	return c.SendStatus(http.StatusOK)
 }
 
-func getPosts(c echo.Context) error {
-	authorID, errParse := strconv.ParseInt(c.Param("id"), 10, 64)
+func getPosts(c *fiber.Ctx) error {
+	authorID, errParse := strconv.ParseInt(c.FormValue("id"), 10, 64)
 	if errParse != nil {
-		return c.String(http.StatusBadRequest, "Bad user ID "+c.Param("id"))
+		return c.SendStatus(http.StatusBadRequest)
 	}
 
 	_, errGet := _blog.GetAuthor(authorID)
 	if errGet != nil {
-		return c.String(http.StatusNotFound, "Author ID "+c.Param("id")+" not found.")
+		return c.SendStatus(http.StatusNotFound)
 	}
 
-	noPosts, errParse := strconv.ParseInt(c.Param("no"), 10, 64)
+	noPosts, errParse := strconv.ParseInt(c.FormValue("no"), 10, 64)
 	if errParse != nil {
-		return c.String(http.StatusBadRequest, "Bad number of posts "+c.Param("no"))
+		return c.SendStatus(http.StatusBadRequest)
 	}
 
 	posts, errGetPosts := _blog.GetPosts(authorID, noPosts)
 	if errGetPosts != nil {
-		return c.String(http.StatusInternalServerError, errGetPosts.Error())
+		return c.SendStatus(http.StatusInternalServerError)
 	}
 
 	var result string
 	for _, v := range posts {
 		result = result + "," + v.Title
 	}
-	return c.String(http.StatusOK, result[1:])
+	return c.SendString(result[1:])
 }
 
-func getAuthors(c echo.Context) error {
+func getAuthors(c *fiber.Ctx) error {
 	authors, errGetUsers := _blog.GetAllAuthors()
 	if errGetUsers != nil {
-		return c.String(http.StatusInternalServerError, errGetUsers.Error())
+		return c.SendStatus(http.StatusInternalServerError)
 	}
 	if len(authors) == 0 {
-		return c.String(http.StatusNotFound, "No users.")
+		return c.SendStatus(http.StatusNotFound)
 	}
 
 	var result string
 	for _, v := range authors {
 		result = result + "," + v.Name
 	}
-	return c.String(http.StatusOK, result[1:])
+	return c.SendString(result[1:])
 }
 
-func getAuthor(c echo.Context) error {
-	authorID, errParse := strconv.ParseInt(c.Param("id"), 10, 64)
+func getAuthor(c *fiber.Ctx) error {
+	authorID, errParse := strconv.ParseInt(c.FormValue("id"), 10, 64)
 	if errParse != nil {
-		return c.String(http.StatusBadRequest, "Bad user ID "+c.Param("id"))
+		return c.SendStatus(http.StatusBadRequest)
 	}
 
 	author, errGet := _blog.GetAuthor(authorID)
 	if errGet != nil {
-		return c.String(http.StatusNotFound, "Author ID "+c.Param("id")+" not found.")
+		return c.SendStatus(http.StatusNotFound)
 	}
-	return c.String(http.StatusOK, author.Name)
+	return c.SendString(author.Name)
 }
