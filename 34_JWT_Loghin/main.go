@@ -39,7 +39,6 @@ func handlePublicRoutes(c echo.Context) error {
 }
 
 func handleRestrictedRoutes(c echo.Context) error {
-
 	user := c.Get("user").(*jwt.Token)
 	claims := user.Claims.(jwt.MapClaims)
 
@@ -64,15 +63,15 @@ func handleLoginReq(c echo.Context) error {
 	return c.JSON(http.StatusOK, token)
 }
 
-func createToken(pFullName string, pIsAdmin bool, pTimeInterval int) (map[string]string, error) {
+func createToken(fullName string, isAdmin bool, timeIntervalSecs int) (map[string]string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
-	claims["name"] = pFullName
-	claims["admin"] = strconv.FormatBool(pIsAdmin)
-	claims["exp"] = time.Now().Add(time.Second * time.Duration(pTimeInterval)).Unix()
+	claims["name"] = fullName
+	claims["admin"] = strconv.FormatBool(isAdmin)
+	claims["exp"] = time.Now().Add(time.Second * time.Duration(timeIntervalSecs)).Unix()
 
-	j, err := token.SignedString([]byte("secret"))
+	j, err := token.SignedString([]byte("secret")) // password only for testing.
 	if err != nil {
 		return nil, err
 	}
