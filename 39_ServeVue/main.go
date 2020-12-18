@@ -13,17 +13,21 @@ import (
 	cache "github.com/TudorHulban/cachejwt"
 )
 
-const port = "3000"
-const URLLogin = "/login"
-const URLRestricted = "/users"
-const URLIndex = "/"
-const secondsCacheExpiration = 600 //default value
-const secondsJanitorClean = 60
-const secondsTokenExpiration = 600 //introduced as we could have different expiration values, ex. shorter for admin
+const (
+	port          = "3000"
+	URLLogin      = "/login"
+	URLRestricted = "/users"
+	URLIndex      = "/"
+)
 
-var c = cache.NEWCache(secondsCacheExpiration)
+const (
+	secondsCacheExpiration = 600 //default value
+	secondsJanitorClean    = 60
+	secondsTokenExpiration = 600 //introduced as we could have different expiration values, ex. shorter for admin
+)
 
 var (
+	c     = cache.NEWCache(secondsCacheExpiration)
 	users = []string{"Joe", "Sam", "Mary"}
 )
 
@@ -64,45 +68,49 @@ func loghin(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("------------------------")
 
-	if r.Method == "POST" {
-
-		err := r.ParseForm()
-		if err != nil {
-			invalidMethod(w, r)
-		}
-
-		u := r.FormValue("user")
-		p := r.FormValue("password")
-		userData := isGoodCredentials(u, p)
-		log.Println("credentials: ", u, p)
-
-		if userData.ID != -1 {
-			tok := new(JWTToken)
-
-			item := cache.Item{Value: userData.ID, Expiration: 0}
-			tokString, err := tok.New(secondsTokenExpiration, 1, "xxx", c, &item)
-			if err != nil {
-				serverError(w, r)
-			} else {
-				json.NewEncoder(w).Encode(tokenResponse{Token: tokString})
-			}
-		} else {
-			badRequest(w, r)
-		}
-	} else {
+	if r.Method != "POST" {
 		invalidMethod(w, r)
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		invalidMethod(w, r)
+		return
+	}
+
+	u := r.FormValue("user")
+	p := r.FormValue("password")
+	log.Println("credentials: ", u, p)
+
+	userData := isGoodCredentials(u, p)
+	if userData.ID == -1 { // TODO: change -1 to default nil value for type
+		badRequest(w, r)
+		return
+	}
+
+	if userData.ID != -1 {
+		tok := new(JWTToken)
+
+		item := cache.Item{Value: userData.ID, Expiration: 0}
+		tokString, err := tok.New(secondsTokenExpiration, 1, "xxx", c, &item)
+		if err != nil {
+			serverError(w, r)
+		} else {
+			json.NewEncoder(w).Encode(tokenResponse{Token: tokString})
+		}
 	}
 }
 
 var getUsers = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	// curl -X GET -H "Authorization: Bearer <string token>" http://localhost:3000/users
 
-	if r.Method == "GET" {
-		response := httpResponse{Msg: "xxxx", Users: users}
-		json.NewEncoder(w).Encode(response)
-	} else {
+	if r.Method != "GET" {
 		invalidMethod(w, r)
+		return
 	}
+
+	response := httpResponse{Msg: "xxxx", Users: users}
+	json.NewEncoder(w).Encode(response)
 })
 
 func main() {
@@ -140,10 +148,8 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	err := server.Shutdown(ctx)
-	if err != nil {
+	if err := server.Shutdown(ctx); err != nil {
 		log.Println("error: ", err)
 	}
 	log.Println("server stopped.")
-
 }

@@ -14,8 +14,7 @@ type UserData struct {
 	LastName  string
 }
 
-func authMiddleware(pNext http.Handler, pCache *cache.Cache) http.Handler {
-
+func authMiddleware(next http.Handler, cache *cache.Cache) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Println("middleware")
 
@@ -23,24 +22,21 @@ func authMiddleware(pNext http.Handler, pCache *cache.Cache) http.Handler {
 		tokenString = strings.Replace(tokenString, "Bearer ", "", 1)
 		log.Println("token: ", tokenString)
 
-		_, isTokenFound := pCache.Get(tokenString)
+		_, isTokenFound := cache.Get(tokenString)
 		if isTokenFound {
-			pNext.ServeHTTP(w, r)
+			next.ServeHTTP(w, r)
 		}
 	})
 }
 
 // ValidateCredentials validates credentials against store
-func isGoodCredentials(pUser, pPassword string) *UserData {
-	var u UserData
-
-	if pUser == "x" && pPassword == "y" {
-		u.ID = 1
-		u.FirstName = "John"
-		u.LastName = "Smith"
-	} else {
-		u.ID = -1
+func isGoodCredentials(user, password string) *UserData {
+	if user == "x" && password == "y" {
+		return UserData{
+			ID:        1,
+			FirstName: "John",
+			LastName:  "Smith",
+		}
 	}
-
-	return &u
+	return nil
 }

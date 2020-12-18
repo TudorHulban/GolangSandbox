@@ -68,13 +68,11 @@ func TestHandleLoginReq(t *testing.T) {
 
 	var tok JwtToken
 
-	err = json.Unmarshal(body, &tok)
-	if err != nil {
+	if err = json.Unmarshal(body, &tok); err != nil {
 		log.Println("unmarshal:", err)
 	}
 
 	tokenString = tok.Token
-
 	if len(tokenString) == 0 {
 		t.Error("No Token.")
 	} else {
@@ -83,7 +81,6 @@ func TestHandleLoginReq(t *testing.T) {
 }
 
 func TestHandleRestrictedRoutes(t *testing.T) {
-
 	if len(tokenString) == 0 {
 		t.Error("No Token.")
 	} else {
@@ -108,12 +105,10 @@ func TestHandleRestrictedRoutes(t *testing.T) {
 
 		var um Users
 		err = json.Unmarshal(body, &um)
-
 		if err != nil {
 			t.Error("Unmarshal  error: ", err)
 		} else {
 			log.Println("response: ", um.Users)
 		}
-
 	}
 }

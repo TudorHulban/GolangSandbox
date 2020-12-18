@@ -5,7 +5,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	cache "github.com/TudorHulban/cachejwt"
@@ -19,6 +18,7 @@ type JWTCustomClaims struct {
 // JWTClaims - payload to JWT
 type JWTClaims struct {
 	JWTCustomClaims
+
 	jwt.StandardClaims
 }
 
@@ -27,55 +27,55 @@ type JWTToken struct {
 }
 
 // NewClaims - see https://jwt.io. pExpiration in seconds, please multiply for nano seconds
-func newClaims(pSecondsAfter int64) *JWTClaims {
-	var instance = new(JWTClaims)
-	instance.TokenExpiration = time.Now().UnixNano() + int64(pSecondsAfter*time.Second.Nanoseconds())
-	log.Println("claims expiration: ", time.Unix(0, instance.TokenExpiration))
-	return instance
+func newClaims(secondsAfter int64) *JWTClaims {
+	return &JWTClaims{
+		JWTCustomClaims{
+			TokenExpiration: time.Now().UnixNano() + int64(secondsAfter*time.Second.Nanoseconds()),
+		},
+	}
 }
 
 // New - constructor for token string. check with https://jwt.io/
-func (t *JWTToken) New(pSecondsAfter int64, pSigningMethod int, pSecret string, pCache *cache.Cache, pItem *cache.Item) (string, error) {
-	var tok = new(jwt.Token)
-	claims := newClaims(pSecondsAfter)
+func (t *JWTToken) New(secondsAfter int64, signingMethod int, secret string, cache *cache.Cache, item *cache.Item) (string, error) {
+	token := new(jwt.Token)
+	claims := newClaims(secondsAfter)
 
-	switch pSigningMethod {
+	switch signingMethod {
 	case 1:
-		tok = jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+		token = jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	default:
-		tok = jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+		token = jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	}
 
-	stringToken, err := tok.SignedString([]byte(pSecret))
+	stringToken, err := token.SignedString([]byte(secret))
 	if err != nil {
 		return "", err
 	}
 
-	pCache.Add(stringToken, pItem) //keep expiration in one place only. here
+	cache.Add(stringToken, item) //keep expiration in one place only. here
 	return stringToken, nil
 }
 
 // Validate - validates and returns JWT token
-func (t *JWTToken) Validate(pString JWTToken) (*jwt.Token, error) {
-	tok, err := jwt.ParseWithClaims(pString.Token, &JWTClaims{}, func(token *jwt.Token) (interface{}, error) {
-
-		_, err := token.Method.(*jwt.SigningMethodHMAC)
-		if err == false {
+func (t *JWTToken) Validate(s JWTToken) (*jwt.Token, error) {
+	return jwt.ParseWithClaims(s.Token, &JWTClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, err := token.Method.(*jwt.SigningMethodHMAC); err == false {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 		return "", nil
 	})
-	return tok, err
 }
 
-func (t *JWTToken) DecodeClaims(pString JWTToken) (*JWTCustomClaims, error) {
-	var custom = new(JWTCustomClaims)
+func (t *JWTToken) DecodeClaims(s JWTToken) (*JWTCustomClaims, error) {
+	custom := new(JWTCustomClaims)
 
-	tok, err := t.Validate(pString)
+	tok, err := t.Validate(s)
 	if err.Error() != "key is of invalid type" {
 		return nil, err
 	}
+
 	claims, _ := tok.Claims.(*JWTClaims)
-	custom.TokenExpiration = claims.TokenExpiration
-	return custom, nil
+	return &JWTCustomClaims{
+		TokenExpiration: claims.TokenExpiration,
+	}, nil
 }
