@@ -13,7 +13,8 @@ type User struct {
 func main() {
 	user1 := &User{
 		Name: "x",
-		Age:  20}
+		Age:  20,
+	}
 
 	// Reflect on Type
 	root1 := reflect.TypeOf(user1).Elem()
