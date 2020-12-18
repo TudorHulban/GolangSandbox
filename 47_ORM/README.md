@@ -1,4 +1,4 @@
-### Performance results
+### Histogram results
  Response time seconds histogram for 500 requests:
  ```
   0.000 [1]		|
