@@ -1,8 +1,10 @@
 package main
 
 import (
+	"os"
 	"strconv"
 
+	"github.com/TudorHulban/log"
 	"gorm.io/gorm"
 )
 
@@ -14,8 +16,7 @@ type Author struct {
 }
 
 type Post struct {
-	gorm.Model
-	ID            uint
+	ID            uint `gorm:"primaryKey"`
 	AuthorId      uint
 	CreatedAt     int64 `gorm:"autoUpdateTime:nano"`
 	LastUpdatedAt int64 `gorm:"autoUpdateTime:nano"`
@@ -26,12 +27,14 @@ type Post struct {
 type Blog struct {
 	postsPerPage uint
 	DBConn       *gorm.DB
+	l            *log.LogInfo
 }
 
 func NewBlog(db *gorm.DB) (*Blog, error) {
 	result := &Blog{
 		postsPerPage: 5,
 		DBConn:       db,
+		l:            log.New(log.DEBUG, os.Stderr, true),
 	}
 
 	errPosts := db.AutoMigrate(&Post{})
@@ -52,7 +55,9 @@ func (b *Blog) AddAuthor(a *Author) error {
 
 func (b *Blog) GetAuthor(id uint) (Author, error) {
 	result := Author{ID: id}
-	return result, b.DBConn.Select(&result).Error
+	err := b.DBConn.Select(&result).Error
+	b.l.Debugf("Error: %s", err)
+	return result, err
 }
 
 func (b *Blog) UpdateAuthor(a *Author) error {

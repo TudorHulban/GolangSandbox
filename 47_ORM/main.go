@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	endpointAuthors = "/xxx"
+	endpointAuthors = "/authors"
 	endpointPosts   = "/posts"
 )
 
@@ -35,22 +35,23 @@ func main() {
 
 	webServer := fiber.New()
 
-	webServer.Static("/", "assets")
+	webServer.Static("/", "index.html")
 	//e.GET("/", hLanding)
-	webServer.Post(endpointAuthors, saveUser)
+	webServer.Post(endpointAuthors, saveAuthor)
 	webServer.Get(endpointAuthors, getAuthors)
 	webServer.Get(endpointAuthors+"/:id", getAuthor)
 	webServer.Get(endpointAuthors+"/:id"+endpointPosts+"/:no", getPosts)
 
 	log.Println("Starting server...")
 	webServer.Listen(":8080")
+	log.Println("Server stopping...")
 }
 
 func hLanding(c *fiber.Ctx) error {
 	return c.SendString("Landing page ...")
 }
 
-func saveUser(c *fiber.Ctx) error {
+func saveAuthor(c *fiber.Ctx) error {
 	u := &Author{
 		Name:   c.FormValue("name"),
 		Emails: c.FormValue("email"),
@@ -58,7 +59,7 @@ func saveUser(c *fiber.Ctx) error {
 
 	errAdd := _blog.AddAuthor(u)
 	if errAdd != nil {
-		return c.SendStatus(http.StatusInternalServerError)
+		return c.Status(http.StatusInternalServerError).SendString("Error: " + errAdd.Error())
 	}
 
 	return c.SendStatus(http.StatusOK)
@@ -95,10 +96,9 @@ func getPosts(c *fiber.Ctx) error {
 func getAuthors(c *fiber.Ctx) error {
 	authors, errGetUsers := _blog.GetAllAuthors()
 	if errGetUsers != nil {
-		return c.Status(http.StatusInternalServerError).SendString("Error:", errGetUsers)
+		return c.Status(http.StatusInternalServerError).SendString("Error: " + errGetUsers.Error())
 	}
 	if len(authors) == 0 {
-		log.Println("xxx")
 		return c.Status(http.StatusNotFound).SendString("no authors found")
 	}
 
@@ -110,14 +110,18 @@ func getAuthors(c *fiber.Ctx) error {
 }
 
 func getAuthor(c *fiber.Ctx) error {
-	authorID, errParse := strconv.ParseInt(c.FormValue("id"), 10, 64)
+	log.Println("param:", c.Params("id"))
+
+	authorID, errParse := strconv.ParseUint(c.Params("id"), 10, 64)
 	if errParse != nil {
-		return c.SendStatus(http.StatusBadRequest)
+		return c.Status(http.StatusBadRequest).SendString("Error: " + errParse.Error())
 	}
 
-	author, errGet := _blog.GetAuthor(uint(authorID))
+	log.Println("author ID:", authorID)
+
+	author, errGet := _blog.GetAuthor(1)
 	if errGet != nil {
-		return c.SendStatus(http.StatusNotFound)
+		return c.Status(http.StatusNotFound).SendString("Error: " + errGet.Error())
 	}
 	return c.SendString(author.Name)
 }
