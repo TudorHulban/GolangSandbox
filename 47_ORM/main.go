@@ -36,7 +36,6 @@ func main() {
 	webServer := fiber.New()
 
 	webServer.Static("/", "index.html")
-	//e.GET("/", hLanding)
 	webServer.Post(endpointAuthors, saveAuthor)
 	webServer.Get(endpointAuthors, getAuthors)
 	webServer.Get(endpointAuthors+"/:id", getAuthor)
@@ -45,10 +44,6 @@ func main() {
 	log.Println("Starting server...")
 	webServer.Listen(":8080")
 	log.Println("Server stopping...")
-}
-
-func hLanding(c *fiber.Ctx) error {
-	return c.SendString("Landing page ...")
 }
 
 func saveAuthor(c *fiber.Ctx) error {
@@ -66,17 +61,17 @@ func saveAuthor(c *fiber.Ctx) error {
 }
 
 func getPosts(c *fiber.Ctx) error {
-	authorID, errParse := strconv.ParseInt(c.FormValue("id"), 10, 64)
+	authorID, errParse := strconv.ParseUint(c.FormValue("id"), 10, 64)
 	if errParse != nil {
 		return c.SendStatus(http.StatusBadRequest)
 	}
 
-	_, errGet := _blog.GetAuthor(uint(authorID))
+	_, errGet := _blog.GetAuthor(authorID)
 	if errGet != nil {
 		return c.SendStatus(http.StatusNotFound)
 	}
 
-	noPosts, errParse := strconv.ParseInt(c.FormValue("no"), 10, 64)
+	noPosts, errParse := strconv.ParseUint(c.FormValue("no"), 10, 64)
 	if errParse != nil {
 		return c.SendStatus(http.StatusBadRequest)
 	}
@@ -109,19 +104,17 @@ func getAuthors(c *fiber.Ctx) error {
 	return c.SendString(result[1:])
 }
 
+// getAuthor Handler retrieves author and sends the author name to the caller.
 func getAuthor(c *fiber.Ctx) error {
-	log.Println("param:", c.Params("id"))
-
 	authorID, errParse := strconv.ParseUint(c.Params("id"), 10, 64)
 	if errParse != nil {
 		return c.Status(http.StatusBadRequest).SendString("Error: " + errParse.Error())
 	}
 
-	log.Println("author ID:", authorID)
-
-	author, errGet := _blog.GetAuthor(1)
+	author, errGet := _blog.GetAuthor(authorID)
 	if errGet != nil {
 		return c.Status(http.StatusNotFound).SendString("Error: " + errGet.Error())
 	}
-	return c.SendString(author.Name)
+	//return c.SendString(author.Name)
+	return c.JSON(author)
 }
