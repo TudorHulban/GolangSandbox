@@ -8,20 +8,19 @@ import (
 
 // Author Structure consolidating user that writes blogs information.
 type Author struct {
-	gorm.Model
-	Id     int64
+	ID     uint `gorm:"primaryKey"`
 	Name   string
-	Emails []string
+	Emails string // should be a slice if gorm would support it
 }
 
 type Post struct {
 	gorm.Model
-	Id              int64
-	AuthorId        int64
-	CreatedTimeUnix int64
-	LastUpdateUnix  int64
-	Title           string
-	Contents        string
+	ID            uint
+	AuthorId      uint
+	CreatedAt     int64 `gorm:"autoUpdateTime:nano"`
+	LastUpdatedAt int64 `gorm:"autoUpdateTime:nano"`
+	Title         string
+	Contents      string
 }
 
 type Blog struct {
@@ -35,13 +34,14 @@ func NewBlog(db *gorm.DB) (*Blog, error) {
 		DBConn:       db,
 	}
 
-	errAuthors := db.AutoMigrate(&Author{})
-	if errAuthors != nil {
-		return nil, errAuthors
-	}
 	errPosts := db.AutoMigrate(&Post{})
 	if errPosts != nil {
 		return nil, errPosts
+	}
+
+	errAuthors := db.AutoMigrate(&Author{})
+	if errAuthors != nil {
+		return nil, errAuthors
 	}
 	return result, nil
 }
@@ -50,8 +50,8 @@ func (b *Blog) AddAuthor(a *Author) error {
 	return b.DBConn.Create(a).Error
 }
 
-func (b *Blog) GetAuthor(id int64) (Author, error) {
-	result := Author{Id: id}
+func (b *Blog) GetAuthor(id uint) (Author, error) {
+	result := Author{ID: id}
 	return result, b.DBConn.Select(&result).Error
 }
 
@@ -77,9 +77,9 @@ func (b *Blog) AddPost(p *Post) error {
 	return b.DBConn.Create(p).Error
 }
 
-func (b *Blog) GetPost(id int64) (Post, error) {
+func (b *Blog) GetPost(id uint) (Post, error) {
 	result := Post{
-		Id: id,
+		ID: id,
 	}
 
 	return result, b.DBConn.Select(&result).Error

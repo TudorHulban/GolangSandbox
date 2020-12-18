@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/driver/sqlite"
@@ -12,7 +11,7 @@ import (
 )
 
 const (
-	endpointAuthors = "/authors"
+	endpointAuthors = "/xxx"
 	endpointPosts   = "/posts"
 )
 
@@ -21,7 +20,9 @@ var _db *gorm.DB
 
 func main() {
 	var errOpen error
-	_db, errOpen = gorm.Open(sqlite.Open("test.dbf"), &gorm.Config{})
+	_db, errOpen = gorm.Open(sqlite.Open("blog.db"), &gorm.Config{
+		SkipDefaultTransaction: true,
+	})
 	if errOpen != nil {
 		log.Fatalf("could not connect to database")
 	}
@@ -41,6 +42,7 @@ func main() {
 	webServer.Get(endpointAuthors+"/:id", getAuthor)
 	webServer.Get(endpointAuthors+"/:id"+endpointPosts+"/:no", getPosts)
 
+	log.Println("Starting server...")
 	webServer.Listen(":8080")
 }
 
@@ -51,7 +53,7 @@ func hLanding(c *fiber.Ctx) error {
 func saveUser(c *fiber.Ctx) error {
 	u := &Author{
 		Name:   c.FormValue("name"),
-		Emails: strings.Split(c.FormValue("email"), ";"),
+		Emails: c.FormValue("email"),
 	}
 
 	errAdd := _blog.AddAuthor(u)
@@ -68,7 +70,7 @@ func getPosts(c *fiber.Ctx) error {
 		return c.SendStatus(http.StatusBadRequest)
 	}
 
-	_, errGet := _blog.GetAuthor(authorID)
+	_, errGet := _blog.GetAuthor(uint(authorID))
 	if errGet != nil {
 		return c.SendStatus(http.StatusNotFound)
 	}
@@ -93,10 +95,11 @@ func getPosts(c *fiber.Ctx) error {
 func getAuthors(c *fiber.Ctx) error {
 	authors, errGetUsers := _blog.GetAllAuthors()
 	if errGetUsers != nil {
-		return c.SendStatus(http.StatusInternalServerError)
+		return c.Status(http.StatusInternalServerError).SendString("Error:", errGetUsers)
 	}
 	if len(authors) == 0 {
-		return c.SendStatus(http.StatusNotFound)
+		log.Println("xxx")
+		return c.Status(http.StatusNotFound).SendString("no authors found")
 	}
 
 	var result string
@@ -112,7 +115,7 @@ func getAuthor(c *fiber.Ctx) error {
 		return c.SendStatus(http.StatusBadRequest)
 	}
 
-	author, errGet := _blog.GetAuthor(authorID)
+	author, errGet := _blog.GetAuthor(uint(authorID))
 	if errGet != nil {
 		return c.SendStatus(http.StatusNotFound)
 	}
