@@ -67,12 +67,12 @@ func SeriesToPoints(seriesX, seriesY []float64) (*[]geom.Point, error) {
 }
 
 func GetSeriesFromFile(filePath string, withHeader bool) ([][]float64, error) {
-	hFile, err := ioutil.ReadFile(filePath)
+	file, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
 
-	scanner1 := bufio.NewScanner(strings.NewReader(string(hFile)))
+	scanner1 := bufio.NewScanner(strings.NewReader(string(file)))
 	var fields []string
 	for scanner1.Scan() {
 		fields = strings.Split(scanner1.Text(), ",")
@@ -81,7 +81,7 @@ func GetSeriesFromFile(filePath string, withHeader bool) ([][]float64, error) {
 	log.Println("noFields: ", noFields)
 	result := make([][]float64, noFields)
 
-	scanner2 := bufio.NewScanner(strings.NewReader(string(hFile)))
+	scanner2 := bufio.NewScanner(strings.NewReader(string(file)))
 	if withHeader {
 		scanner2.Scan()
 	}

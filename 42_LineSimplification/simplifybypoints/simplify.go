@@ -15,14 +15,15 @@ type Point struct {
 }
 
 // Points takes an array of points and returns the simplified version as per DouglasPeucker alghoritm
-func Points(pPoints []Point, tolerance float64, highestQuality bool) ([]Point, error) {
-	if len(pPoints) < 2 {
+func Points(points []Point, tolerance float64, highestQuality bool) ([]Point, error) {
+	if len(points) < 2 {
 		return nil, errors.New("points array to small")
 	}
 	if highestQuality {
-		return pointsDouglasPeucker(pPoints, tolerance), nil
+		return pointsDouglasPeucker(points, tolerance), nil
 	}
-	simplePoints, err := radialDistance(pPoints, tolerance)
+
+	simplePoints, err := radialDistance(points, tolerance)
 	if err != nil {
 		return nil, err
 	}

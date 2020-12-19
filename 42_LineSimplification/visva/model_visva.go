@@ -7,15 +7,16 @@ import (
 
 //type visvalingam
 type Visvalingam struct {
+	buildState bool
+	heap       *heap.Heap
 	coords     []*GeomPoint
 	triangles  []*Triangle
-	heap       *heap.Heap
-	buildState bool
 }
 
 // NewVisva
 func NewVisva(coords []geom.Point) *Visvalingam {
 	pts := make([]*GeomPoint, len(coords))
+
 	for i, coord := range coords {
 		pts[i] = &GeomPoint{Point: coord, area: 0.0}
 	}
@@ -27,9 +28,11 @@ func (vis *Visvalingam) build() *Visvalingam {
 	vis.heap = heap.NewHeap(TriangleAreaCompare, heap.NewHeapType().AsMin())
 	vis.createTriangles().updateTrianglePtrs()
 	vis.buildState = true
+
 	return vis
 }
 
+// Simplify Method TODO: add comment
 func (vis *Visvalingam) Simplify(threshold float64) []geom.Point {
 	if !vis.buildState {
 		vis.build()
@@ -41,6 +44,7 @@ func (vis *Visvalingam) Simplify(threshold float64) []geom.Point {
 		if triangle == nil {
 			break
 		}
+
 		t := triangle.(*Triangle)
 
 		// If the area of the current point is less than that of the previous point
@@ -84,8 +88,8 @@ func (vis *Visvalingam) createTriangles() *Visvalingam {
 	vis.triangles = make([]*Triangle, 0)
 	for i, n := 1, len(vis.coords)-1; i < n; i++ {
 		coords := vis.coords[i-1 : i+2]
-		t := NewTriangle(coords)
 
+		t := NewTriangle(coords)
 		if t.b.area > 0 {
 			vis.triangles = append(vis.triangles, t)
 			vis.heap.Push(t)

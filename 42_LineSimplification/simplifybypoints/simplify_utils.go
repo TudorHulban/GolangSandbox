@@ -20,35 +20,36 @@ func pointsSqSegDist(p, p1, p2 Point) float64 {
 }
 
 // radialDistance computes distances between provided points.
-func radialDistance(pPoints []Point, pTolerance float64) ([]Point, error) {
-	prevPoint := pPoints[0]
+func radialDistance(points []Point, tolerance float64) ([]Point, error) {
+	prevPoint := points[0]
 	result := []Point{prevPoint}
 	var currentPoint Point
 
-	for _, currentPoint = range pPoints {
+	for _, currentPoint = range points {
 		delta := pointSquareDistance(currentPoint, prevPoint)
-		if delta > pTolerance {
+		if delta > tolerance {
 			result = append(result, currentPoint)
 			prevPoint = currentPoint
 		}
 	}
+
 	if prevPoint != currentPoint {
 		result = append(result, currentPoint)
 	}
 	return result, nil
 }
 
-func pointSquareDistance(pPoint1, pPoint2 Point) float64 {
-	dx := pPoint1.X - pPoint2.X
-	dy := pPoint1.Y - pPoint2.Y
+func pointSquareDistance(point1, point2 Point) float64 {
+	dx := point1.X - point2.X
+	dy := point1.Y - point2.Y
 	return dx*dx + dy*dy
 }
 
 // pointsDouglasPeucker is the actual alghorytm.
-func pointsDouglasPeucker(pPoints []Point, sqTolerance float64) []Point {
-	markers := make([]int, len(pPoints))
+func pointsDouglasPeucker(points []Point, tolerance float64) []Point {
+	markers := make([]int, len(points))
 	firstPos := 0
-	lastPos := len(pPoints) - 1
+	lastPos := len(points) - 1
 
 	var stackPoints []int
 	result := []Point{}
@@ -60,30 +61,31 @@ func pointsDouglasPeucker(pPoints []Point, sqTolerance float64) []Point {
 			return 0
 		}
 		result := stackPoints[len(stackPoints)-1]
-		stackPoints = stackPoints[0 : len(stackPoints)-1]
+		stackPoints = stackPoints[0 : len(stackPoints)-1] // TODO: why needed before returning?
 		return result
-
 	}
+
 	index := 0
 	for lastPos > 0 {
 		maxSqDist = 0
 		for i := firstPos + 1; i < lastPos; i++ {
-			sqDist = pointsSqSegDist(pPoints[i], pPoints[firstPos], pPoints[lastPos])
+			sqDist = pointsSqSegDist(points[i], points[firstPos], points[lastPos])
 			if sqDist > maxSqDist {
 				index = i
 				maxSqDist = sqDist
 			}
 		}
-		if maxSqDist > sqTolerance {
+		if maxSqDist > tolerance {
 			markers[index] = 1
 			stackPoints = append(stackPoints, firstPos, index, index, lastPos)
 		}
 		lastPos = pop()
 		firstPos = pop()
 	}
-	for i := 0; i < len(pPoints); i++ {
+
+	for i := 0; i < len(points); i++ {
 		if i < len(markers) && markers[i] > 0 {
-			result = append(result, pPoints[i])
+			result = append(result, points[i])
 		}
 	}
 	return result
