@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"net/url"
 )
 
 type FieldConfig struct {
@@ -36,19 +35,24 @@ func main() {
 	log.Println("DoPost error: ", err)
 }
 
-func DoPost(pURL string, pConfig *GenConfig) error {
-	u, _ := url.ParseRequestURI(pURL)
+func DoPost(url string, cfg *GenConfig) error {
+	u, _ := url.ParseRequestURI(url)
 	apiURLFormatted := u.String()
 
 	client := &http.Client{}
 	buf := new(bytes.Buffer)
-	json.NewEncoder(buf).Encode(pConfig)
-	req, err := http.NewRequest("POST", apiURLFormatted, buf)
+	json.NewEncoder(buf).Encode(cfg)
+
+	req, errReq := http.NewRequest("POST", apiURLFormatted, buf)
+	if errReq != nil {
+		return errReq
+	}
 
 	res, err := client.Do(req)
 	if err != nil {
 		return err
 	}
+
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
 
@@ -57,6 +61,7 @@ func DoPost(pURL string, pConfig *GenConfig) error {
 	if err != nil {
 		return err
 	}
+
 	log.Println(data.ColumnNames)
 	log.Println("points before: ", data.Rows)
 
@@ -67,31 +72,35 @@ func DoPost(pURL string, pConfig *GenConfig) error {
 	return err
 }
 
-func NewConfig(pNoRows int64) *GenConfig {
-	instance := new(GenConfig)
-	instance.NoRows = pNoRows
-	instance.Configuration = make([]FieldConfig, 2)
+func NewConfig(noRows int64) *GenConfig {
+	f1 := FieldConfig{
+		Name:         "a",
+		Type:         2,
+		Length:       5,
+		MinValue:     0,
+		MaxValue:     100,
+		PositiveOnly: true,
+	}
 
-	instance.Configuration[0].Name = "a"
-	instance.Configuration[0].Type = 2
-	instance.Configuration[0].Length = 5
-	instance.Configuration[0].MinValue = 0
-	instance.Configuration[0].MaxValue = 100
-	instance.Configuration[0].PositiveOnly = true
+	f2 := FieldConfig{
+		Name:         "b",
+		Type:         0,
+		Length:       5,
+		MinValue:     0,
+		MaxValue:     100,
+		PositiveOnly: true,
+	}
 
-	instance.Configuration[1].Name = "b"
-	instance.Configuration[1].Type = 0
-	instance.Configuration[1].Length = 5
-	instance.Configuration[1].MinValue = 0
-	instance.Configuration[1].MaxValue = 100
-	instance.Configuration[1].PositiveOnly = true
-	return instance
+	return &GenConfig{
+		NoRows:        noRows,
+		Configuration: []FieldConfig{f1, f2},
+	}
 }
 
-func SliceInterfaceToFloats(pSlice *[][]interface{}) *[][]float64 {
+func SliceInterfaceToFloats(s *[][]interface{}) *[][]float64 {
 	instance := make([][]float64, 0)
 
-	for _, v := range *pSlice {
+	for _, v := range *s {
 		row := make([]float64, 0)
 
 		for _, vv := range v {

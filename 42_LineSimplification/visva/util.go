@@ -30,20 +30,22 @@ type Triangle struct {
 
 func NewTriangle(pts []*GeomPoint) *Triangle {
 	var a, b, c = pts[0], pts[1], pts[2]
+
 	b.area = Area(&a.Point, &b.Point, &c.Point)
 	return &Triangle{a: a, b: b, c: c, prev: nil, next: nil}
 }
 
 func TriangleAreaCompare(t, o interface{}) int {
-	var self = t.(*Triangle)
-	var other = o.(*Triangle)
-	dx := float64(self.b.area - other.b.area)
+	dx := float64(t.(*Triangle).b.area - o.(*Triangle).b.area)
 
 	if math.FloatEqual(dx, 0.0) {
 		return 0
-	} else if dx < 0 {
+	}
+
+	if dx < 0 {
 		return -1
 	}
+
 	return 1
 }
 
@@ -51,21 +53,21 @@ func (t *Triangle) String() string {
 	return geom.NewPolygon(geom.Coordinates([]geom.Point{t.a.Point, t.b.Point, t.c.Point})).WKT()
 }
 
-func SeriesToPoints(pSeriesX, pSeriesY []float64) (*[]geom.Point, error) {
-	if len(pSeriesX) != len(pSeriesY) {
+func SeriesToPoints(seriesX, seriesY []float64) (*[]geom.Point, error) {
+	if len(seriesX) != len(seriesY) {
 		return nil, errors.New("Series are not of equal values")
 	}
-	noPoints := len(pSeriesX)
+	noPoints := len(seriesX)
 
-	instance := []geom.Point{}
+	instance := make([]geom.Point, noPoints)
 	for i := 0; i < noPoints-1; i++ {
-		instance = append(instance, geom.Point{pSeriesX[i], pSeriesY[i]})
+		instance[i] = geom.Point{seriesX[i], seriesY[i]}
 	}
 	return &instance, nil
 }
 
-func GetSeriesFromFile(pFilePath string, pWithHeader bool) ([][]float64, error) {
-	hFile, err := ioutil.ReadFile(pFilePath)
+func GetSeriesFromFile(filePath string, withHeader bool) ([][]float64, error) {
+	hFile, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +82,7 @@ func GetSeriesFromFile(pFilePath string, pWithHeader bool) ([][]float64, error) 
 	result := make([][]float64, noFields)
 
 	scanner2 := bufio.NewScanner(strings.NewReader(string(hFile)))
-	if pWithHeader {
+	if withHeader {
 		scanner2.Scan()
 	}
 
