@@ -5,22 +5,21 @@ import (
 )
 
 func main() {
-	var y = func(x string) {
+	a1 := func(x string) {
 		log.Println(x)
 	}
-	y("xxx")
+	a1("xxx")
 
-	var z = func(x int) int {
+	a2 := func(x int) int {
 		return x + 1
 	}
-	log.Println(z(1))
+	log.Println(a2(1))
 
 	s := []string{"a", "b"}
 
-	var superSlice = func(x []string) {
+	a3 := func(x []string) {
 		x = append(x, "c")
 		log.Println(x)
 	}
-	superSlice(s)   // copy slice and do something with it
-	log.Println(s)
+	a3(s)
 }
