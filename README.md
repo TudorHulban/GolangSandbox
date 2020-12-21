@@ -117,6 +117,7 @@ https://www.sohamkamani.com/blog/golang/2018-06-20-golang-factory-patterns/
 ```
 ### Others
 ```html
+https://medium.com/swlh/provider-model-in-go-and-why-you-should-use-it-clean-architecture-1d84cfe1b097
 http://blog.ralch.com/tutorial/design-patterns/golang-design-patterns/
 http://blog.ralch.com/articles/design-patterns/golang-decorator/ 
 http://blog.ralch.com/articles/design-patterns/golang-adapter/ 
