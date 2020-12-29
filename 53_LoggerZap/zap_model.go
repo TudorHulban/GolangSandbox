@@ -1,4 +1,4 @@
-package loggerzap
+package loggerZap
 
 import (
 	"go.uber.org/zap"
@@ -40,12 +40,13 @@ func (el TLogger) Printf(format string, args ...interface{}) {
 	el.l.Infof(format, args...)
 }
 
-func NewExtLogger(cfg ConfigLogger) (*TLogger, error) {
+func NewExtLogger(cfg Config) (*TLogger, error) {
 	sugar, err := newZapLogger(cfg)
 	if err != nil {
 		return &TLogger{}, err
 	}
-	result := new(TLogger)
-	result.l = *sugar
-	return result, nil // not working.
+
+	return &TLogger{
+		l: *sugar,
+	}, nil
 }

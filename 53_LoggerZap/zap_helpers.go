@@ -1,4 +1,4 @@
-package loggerzap
+package loggerZap
 
 import (
 	"errors"
@@ -11,7 +11,7 @@ import (
 var zapLevels = map[int8]zapcore.Level{-1: zapcore.DebugLevel, 0: zapcore.InfoLevel, 1: zapcore.WarnLevel, 2: zapcore.ErrorLevel, 5: zapcore.FatalLevel}
 
 func toZapLevel(logLevel int8) (zapcore.LevelEnabler, error) {
-	if _, exists := zapLevels[pLevlogLevelel]; !exists {
+	if _, exists := zapLevels[logLevel]; !exists {
 		return nil, errors.New("log level not found")
 	}
 	return zapLevels[logLevel], nil
@@ -24,7 +24,7 @@ func newZapLogger(cfg Config) (*zap.SugaredLogger, error) {
 	zapConfig := zap.NewProductionEncoderConfig()
 	zapConfig.EncodeTime = zapcore.EpochNanosTimeEncoder
 
-	zaplev, err := toZapLevel(cfg.levCurrent)
+	zaplev, err := toZapLevel(cfg.LevCurrent)
 	if err != nil {
 		return nil, err
 	}
