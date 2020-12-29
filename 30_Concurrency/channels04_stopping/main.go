@@ -25,23 +25,26 @@ func main() {
 		if !isOpen {
 			break
 		}
+
 		log.Println("ev:", ev)
 	}
 }
 
 // https://stackoverflow.com/questions/38798863/golang-pause-a-loop-in-a-goroutine-with-channels
-func doControlledWork(pChResults chan int, pChPause, pChWork, pChQuit chan bool, pTask workTask) {
+func doControlledWork(chResults chan int, chPause, chWork, chQuit chan bool, task workTask) {
 	for {
 		select {
-		case <-pChPause:
+		case <-chPause:
 			log.Println("Pause")
-		case ev := <-pChQuit:
+
+		case ev := <-chQuit:
 			{
 				if !ev {
 					log.Println("Quit")
 					return
 				}
 			}
+
 		default:
 			{
 				//do work
@@ -50,7 +53,8 @@ func doControlledWork(pChResults chan int, pChPause, pChWork, pChQuit chan bool,
 	}
 }
 
-func doQuit(pChAction chan bool, pAfterSeconds int) {
-	time.Sleep(time.Duration(pAfterSeconds) * time.Second)
-	pChAction <- false
+func doQuit(chAction chan bool, afterSeconds int) {
+	time.Sleep(time.Duration(afterSeconds) * time.Second)
+
+	chAction <- false
 }

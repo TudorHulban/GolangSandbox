@@ -13,10 +13,10 @@ type Content struct {
 	Description string
 }
 
-func HowManyPosts(pDBHandler *sql.DB) (int, error) {
+func HowManyPosts(dbHandler *sql.DB) (int, error) {
 	var howMany int
 
-	err := pDBHandler.QueryRow(`select max(id) from posts`).Scan(&howMany) //would actually read the sequence last val as ID is serial type, verify with explain select ...
+	err := dbHandler.QueryRow(`select max(id) from posts`).Scan(&howMany) //would actually read the sequence last val as ID is serial type, verify with explain select ...
 	if err != nil {
 		log.Fatal("HowManyPosts.Query:", err)
 	}
@@ -24,12 +24,12 @@ func HowManyPosts(pDBHandler *sql.DB) (int, error) {
 	return howMany, err
 }
 
-func QueryPosts(pDBHandler *sql.DB, pPage int64, pItemsPerPage int64) ([]Content, error) {
+func QueryPosts(dbHandler *sql.DB, pPage int64, pItemsPerPage int64) ([]Content, error) {
 
 	idStart := pPage * pItemsPerPage
 	idEnd := (pPage+1)*pItemsPerPage - 1
 
-	rows, err := pDBHandler.Query(`select id, description from posts where id between $1 and $2`, idStart, idEnd)
+	rows, err := dbHandler.Query(`select id, description from posts where id between $1 and $2`, idStart, idEnd)
 	if err != nil {
 		log.Fatal("QueryPosts.Query:", err)
 	}

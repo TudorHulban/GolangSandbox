@@ -32,7 +32,7 @@ func authMiddleware(next http.Handler, cache *cache.Cache) http.Handler {
 // ValidateCredentials validates credentials against store
 func isGoodCredentials(user, password string) *UserData {
 	if user == "x" && password == "y" {
-		return UserData{
+		return &UserData{
 			ID:        1,
 			FirstName: "John",
 			LastName:  "Smith",

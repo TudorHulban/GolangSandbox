@@ -102,7 +102,7 @@ func (rDBPostgresInfo DBPostgresInfo) TableExists(db *sql.DB, dbName, tableName 
 func (maria DBMariaInfo) TableExists(db *sql.DB, dbName, tableName string) bool {
 	var occurences bool
 
-	theDML := "select count(1) from information_schema.tables WHERE table_schema=" + "'" + pDatabase + "'" + " AND table_name=" + "'" + pTable + "'" + " limit 1"
+	theDML := "select count(1) from information_schema.tables WHERE table_schema=" + "'" + dbName + "'" + " AND table_name=" + "'" + tableName + "'" + " limit 1"
 	_ = db.QueryRow(theDML).Scan(&occurences)
 
 	return occurences
@@ -117,64 +117,62 @@ func (pg DBPostgresInfo) CreateTable(db *sql.DB, dbName, tableName, ddl string, 
 		theDDL = ddl
 	}
 
-	theDDL = "CREATE TABLE " + pTableName + "(" + theDDL + ")"
+	theDDL = "CREATE TABLE " + tableName + "(" + theDDL + ")"
 
-	_, err := pDB.Exec(theDDL)
+	_, err := db.Exec(theDDL)
 	return errors.WithMessage(err, "DB Postgres CreateTable")
 
-	return rDBPostgresInfo.TableExists(pDB, pDatabase, pTableName)
+	return pg.TableExists(db, dbName, tableName)
 }
 
 func (rDBMariaInfo DBMariaInfo) CreateTable(db *sql.DB, dbName, tableName, ddl string, columnPKAutoincrement bool) bool {
 	var theDDL string
 
 	if columnPKAutoincrement {
-		theDDL = "\"id\" serial," + pDDL
+		theDDL = "\"id\" serial," + ddl
 	} else {
-		theDDL = pDDL
+		theDDL = ddl
 	}
 
-	theDDL = "CREATE TABLE " + pTableName + " (" + strings.Replace(theDDL, "\"", "", -1) + ")"
+	theDDL = "CREATE TABLE " + tableName + " (" + strings.Replace(theDDL, "\"", "", -1) + ")"
 
-	fmt.Println(theDDL, pColumnPKAutoincrement)
+	fmt.Println(theDDL, columnPKAutoincrement)
 
-	_, err := pDB.Exec(theDDL)
+	_, err := db.Exec(theDDL)
 	checkErr(err, "rDBMariaInfo CreateTable: "+theDDL)
 
-	return rDBMariaInfo.TableExists(pDB, pDatabase, pTableName)
+	return rDBMariaInfo.TableExists(db, dbName, tableName)
 }
 
-func (rDBSQLiteInfo DBSQLiteInfo) SingleInsert(pDB *sql.DB, pTableName string, pValues []string) error {
-	theDDL := "insert into " + pTableName + " values(" + "\"" + strings.Join(pValues, "\""+","+"\"") + "\"" + ")"
-	_, err := pDB.Exec(theDDL)
+func (rDBSQLiteInfo DBSQLiteInfo) SingleInsert(db *sql.DB, tableName string, values []string) error {
+	theDDL := "insert into " + tableName + " values(" + "\"" + strings.Join(values, "\""+","+"\"") + "\"" + ")"
+	_, err := db.Exec(theDDL)
 
 	return err
 }
 
-func (rDBPostgresInfo DBPostgresInfo) SingleInsert(pDB *sql.DB, pTableName string, pValues []string) error {
-
-	theDDL := "insert into " + pTableName + " values(" + "\"" + strings.Join(pValues, "\""+","+"\"") + "\"" + ")"
-	_, err := pDB.Exec(theDDL)
-
-	return err
-}
-
-func (rDBMariaInfo DBMariaInfo) SingleInsert(pDB *sql.DB, pTableName string, pValues []string) error {
-
-	theDDL := "insert into " + pTableName + " values(" + "\"" + strings.Join(pValues, "\""+","+"\"") + "\"" + ")"
-	_, err := pDB.Exec(theDDL)
+func (rDBPostgresInfo DBPostgresInfo) SingleInsert(db *sql.DB, tableName string, values []string) error {
+	theDDL := "insert into " + tableName + " values(" + "\"" + strings.Join(values, "\""+","+"\"") + "\"" + ")"
+	_, err := db.Exec(theDDL)
 
 	return err
 }
 
-func (rDBSQLiteInfo DBSQLiteInfo) BulkInsert(pDB *sql.DB, pTableName string, pColumnNames []string, pValues [][]string) error {
+func (rDBMariaInfo DBMariaInfo) SingleInsert(db *sql.DB, tableName string, values []string) error {
+	theDDL := "insert into " + tableName + " values(" + "\"" + strings.Join(values, "\""+","+"\"") + "\"" + ")"
+	_, err := db.Exec(theDDL)
+
+	return err
+}
+
+func (rDBSQLiteInfo DBSQLiteInfo) BulkInsert(db *sql.DB, tableName string, pColumnNames []string, pValues [][]string) error {
 	theQuestionMarks := returnNoValues(pValues[0], "?")
 
 	// -------- DB Transaction Start -----------
-	dbTransaction, err := pDB.Begin()
-	checkErr(err, "pDB.Begin")
+	dbTransaction, err := db.Begin()
+	checkErr(err, "db.Begin")
 
-	statement := "insert into " + pTableName + "(" + strings.Join(pColumnNames, ",") + ")" + " values " + theQuestionMarks
+	statement := "insert into " + tableName + "(" + strings.Join(pColumnNames, ",") + ")" + " values " + theQuestionMarks
 
 	dml, err := dbTransaction.Prepare(statement)
 	checkErr(err, "dbTransaction.Prepare")
@@ -194,14 +192,14 @@ func (rDBSQLiteInfo DBSQLiteInfo) BulkInsert(pDB *sql.DB, pTableName string, pCo
 	return err
 }
 
-func (rDBMariaInfo DBMariaInfo) BulkInsert(pDB *sql.DB, pTableName string, pColumnNames []string, pValues [][]string) error {
+func (rDBMariaInfo DBMariaInfo) BulkInsert(db *sql.DB, tableName string, pColumnNames []string, pValues [][]string) error {
 	theQuestionMarks := returnNoValues(pValues[0], "?")
 
 	// -------- DB Transaction Start -----------
-	dbTransaction, err := pDB.Begin()
-	checkErr(err, "pDB.Begin")
+	dbTransaction, err := db.Begin()
+	checkErr(err, "db.Begin")
 
-	statement := "insert into " + pTableName + "(" + strings.Join(pColumnNames, ",") + ")" + " values " + theQuestionMarks
+	statement := "insert into " + tableName + "(" + strings.Join(pColumnNames, ",") + ")" + " values " + theQuestionMarks
 
 	dml, err := dbTransaction.Prepare(statement)
 	checkErr(err, "dbTransaction.Prepare")
