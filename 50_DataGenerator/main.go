@@ -36,6 +36,7 @@ func dataHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
+
 	bodyString := ioutil.NopCloser(bytes.NewBuffer(body))
 	log.Println("body:", bodyString)
 

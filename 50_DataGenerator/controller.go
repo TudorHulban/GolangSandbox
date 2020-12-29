@@ -35,23 +35,24 @@ type GenConfig struct {
 }
 
 // GetConfig - takes configuration as JSON and maps it to the configuration structure
-func GetConfig(pConfigJSON string) (*GenConfig, error) {
+func GetConfig(configJSON string) (*GenConfig, error) {
 	instance := new(GenConfig)
 
-	err := json.Unmarshal([]byte(pConfigJSON), &instance)
-	if err != nil {
+	if err := json.Unmarshal([]byte(configJSON), &instance); err != nil {
 		return nil, err
 	}
 	return instance, nil
 }
 
 // GetData - takes input configuration structure, returns generated data
-func GetData(pConfig *GenConfig) (*GenData, error) {
-	instance := new(GenData)
-	instance.Rows = make([][]interface{}, pConfig.NoRows)
+func GetData(config *GenConfig) (*GenData, error) {
+	instance := &GenData{
+		Rows: make([][]interface{}, config.NoRows),
+	}
+
 	bufferColumns := [][]interface{}{}
 
-	for _, fieldConfig := range pConfig.Configuration {
+	for _, fieldConfig := range config.Configuration {
 		instance.ColumnNames = append(instance.ColumnNames, fieldConfig.Name)
 
 		switch fieldConfig.Type {
@@ -60,24 +61,24 @@ func GetData(pConfig *GenConfig) (*GenData, error) {
 				if (fieldConfig.MinValue > fieldConfig.MaxValue) && (fieldConfig.MaxValue == 0) {
 					return nil, errors.New("bad configuration")
 				}
-				n := newNumbers(fieldConfig.Length, fieldConfig.PositiveOnly, fieldConfig.MinValue, fieldConfig.MaxValue, int(pConfig.NoRows))
+				n := newNumbers(fieldConfig.Length, fieldConfig.PositiveOnly, fieldConfig.MinValue, fieldConfig.MaxValue, int(config.NoRows))
 				bufferColumns = append(bufferColumns, *sliceIntToInterface(&n))
 			}
 
 		case 1:
 			{
-				s := newCharacters(fieldConfig.Length, int(pConfig.NoRows))
+				s := newCharacters(fieldConfig.Length, int(config.NoRows))
 				bufferColumns = append(bufferColumns, *sliceStringToInterface(&s))
 			}
 		case 2:
 			{
-				id := newIDs(int(pConfig.NoRows))
+				id := newIDs(int(config.NoRows))
 				bufferColumns = append(bufferColumns, *sliceIntToInterface(&id))
 			}
 		}
 	}
 
-	for i := 0; i < int(pConfig.NoRows); i++ {
+	for i := 0; i < int(config.NoRows); i++ {
 		instance.Rows[i] = make([]interface{}, len(instance.ColumnNames))
 
 		for k := range instance.ColumnNames {

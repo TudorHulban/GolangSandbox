@@ -1,21 +1,22 @@
 package datageneration
+
 import (
 	"math/rand"
 	"time"
 )
 
-func randInt(pMin, pMax int) int {
-	return pMin + rand.Intn(pMax-pMin)
+func randInt(min, max int) int {
+	return min + rand.Intn(max-min)
 }
 
-func newNumbers(pLength int, pPositive bool, pMin, pMax, pHowMany int) []int {
+func newNumbers(length int, positive bool, min, max, howMany int) []int {
 	rand.Seed(time.Now().UnixNano())
-	randNumbers := make([]int, pHowMany)
+	randNumbers := make([]int, howMany)
 
-	for i := 0; i < pHowMany; i++ {
+	for i := 0; i < howMany; i++ {
 		for {
-			randNumbers[i] = randInt(pMin, pMax)
-			if randNumbers[i] > pMin {
+			randNumbers[i] = randInt(min, max)
+			if randNumbers[i] > min {
 				break
 			}
 		}
@@ -23,12 +24,12 @@ func newNumbers(pLength int, pPositive bool, pMin, pMax, pHowMany int) []int {
 	return randNumbers
 }
 
-func newCharacters(pLength int, pHowMany int) []string {
+func newCharacters(length int, howMany int) []string {
 	rand.Seed(time.Now().UnixNano())
 	randChars := make([]string, 0)
 
-	for h := 0; h < pHowMany; h++ {
-		bytes := make([]byte, pLength)
+	for h := 0; h < howMany; h++ {
+		bytes := make([]byte, length)
 		for k := range bytes {
 			bytes[k] = byte(randInt(65, 90))
 		}
@@ -37,11 +38,11 @@ func newCharacters(pLength int, pHowMany int) []string {
 	return randChars
 }
 
-func newIDs(pHowMany int) []int {
-	randNumbers := make([]int, pHowMany)
+func newIDs(howMany int) []int {
+	randNumbers := make([]int, howMany)
 
-	for i := 0; i < pHowMany; i++ {
-		randNumbers[i] = i + 1
+	for i := 0; i < howMany; i++ {
+		randNumbers[i] = i + 1 // TODO: add random number generation
 	}
 	return randNumbers
 }

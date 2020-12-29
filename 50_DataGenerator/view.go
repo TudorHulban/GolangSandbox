@@ -1,4 +1,5 @@
 package datageneration
+
 import (
 	"os"
 	"strconv"
@@ -6,24 +7,24 @@ import (
 )
 
 // DataToFile - exports generated data to file
-func DataToFile(pWriteTo string, pData *GenData) error {
-	hFile, err := os.Create(pWriteTo)
+func DataToFile(writeTo string, data *GenData) error {
+	file, err := os.Create(writeTo)
 	if err != nil {
 		return err
 	}
-	defer hFile.Close()
+	defer file.Close()
 
 	// write header
 	fileHeader := []string{}
-	for _, columnName := range pData.ColumnNames {
+	for _, columnName := range data.ColumnNames {
 		fileHeader = append(fileHeader, strings.Trim(columnName, " "))
 	}
 
-	hFile.WriteString(strings.Join(fileHeader, ",") + "\n")
-	hFile.Sync()
+	file.WriteString(strings.Join(fileHeader, ",") + "\n")
+	file.Sync()
 
 	// write content
-	for _, rowVals := range pData.Rows {
+	for _, rowVals := range data.Rows {
 		fileRow := []string{}
 
 		for _, value := range rowVals {
@@ -35,8 +36,8 @@ func DataToFile(pWriteTo string, pData *GenData) error {
 				fileRow = append(fileRow, strconv.FormatInt(int64(value.(int)), 10))
 			}
 		}
-		hFile.WriteString(strings.Join(fileRow, ",") + "\n")
+		file.WriteString(strings.Join(fileRow, ",") + "\n")
 	}
-	hFile.Sync()
+	file.Sync()
 	return nil
 }

@@ -55,7 +55,6 @@ func createFile(filePath string) (*os.File, func(), error) {
 }
 
 func ZipFile(aFilePath string) error {
-
 	zipWriter := zip.NewWriter(targetFile)
 	defer zipWriter.Close()
 
