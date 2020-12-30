@@ -6,6 +6,8 @@ import (
 	"net/http"
 )
 
+// no router.
+
 // Signal Type for representing one signal.
 type Signal struct {
 	Value int `json:"value"`
@@ -14,10 +16,14 @@ type Signal struct {
 // Signals Type for sending signals.
 type Signals []Signal
 
-const theRoute = "/"
-const theURL = "localhost:8080"
+const (
+	theRoute = "/"
+	theURL   = "localhost:8080"
+)
 
 func main() {
+	log.Println("starting...")
+
 	http.HandleFunc(theRoute, handleRoutes)
 	panic(http.ListenAndServe(theURL, nil))
 }
@@ -35,19 +41,17 @@ func handleRoutes(w http.ResponseWriter, r *http.Request) {
 		arrayHandler(w, r)
 		return
 	}
+
 	http.ServeFile(w, r, r.URL.Path[1:])
 }
 
+// loginHandler Handler with no marshalling, just returning slice of bytes.
 func loginHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("login call")
-	theJSON := []byte(`{"Response":{"Status":"success","StatusCode":200,"Failed":false,"Message":"success"}}`)
-
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(theJSON)
+	w.Write([]byte(`{"Response":{"Status":"success","StatusCode":200,"Failed":false,"Message":"success"}}`))
 }
 
 func jarrayHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("json array")
 	theJSON := []byte(`{"response":[{"t1":1},{"t1":2}]}`)
 
 	w.Header().Set("Content-Type", "application/json")
@@ -55,7 +59,6 @@ func jarrayHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func arrayHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("defined json array")
 	signals := Signals{
 		Signal{
 			Value: 101,
@@ -64,6 +67,7 @@ func arrayHandler(w http.ResponseWriter, r *http.Request) {
 			Value: 78,
 		},
 	}
+
 	theJSON, errMa := json.Marshal(signals)
 	if errMa != nil {
 		w.Write([]byte(errMa.Error()))
