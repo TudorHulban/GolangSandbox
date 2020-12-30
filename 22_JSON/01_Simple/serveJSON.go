@@ -33,11 +33,8 @@ func handleRoutes(w http.ResponseWriter, r *http.Request) {
 		loginHandler(w, r)
 		return
 	}
-	if r.URL.Path == "/jarray" {
-		jarrayHandler(w, r)
-		return
-	}
-	if r.URL.Path == "/darray" {
+
+	if r.URL.Path == "/array" {
 		arrayHandler(w, r)
 		return
 	}
@@ -48,14 +45,7 @@ func handleRoutes(w http.ResponseWriter, r *http.Request) {
 // loginHandler Handler with no marshalling, just returning slice of bytes.
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(`{"Response":{"Status":"success","StatusCode":200,"Failed":false,"Message":"success"}}`))
-}
-
-func jarrayHandler(w http.ResponseWriter, r *http.Request) {
-	theJSON := []byte(`{"response":[{"t1":1},{"t1":2}]}`)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(theJSON)
+	w.Write([]byte(`[{"value":101},{"value":78}]`))
 }
 
 func arrayHandler(w http.ResponseWriter, r *http.Request) {
