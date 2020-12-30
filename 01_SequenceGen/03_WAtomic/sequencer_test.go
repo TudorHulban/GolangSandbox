@@ -1,5 +1,10 @@
 package sequence
 
+/*
+File tests sequence generation.
+Passes with go test -race.
+*/
+
 import (
 	"sync"
 	"testing"
@@ -14,25 +19,23 @@ const (
 
 func Test1_CurrentValue(t *testing.T) {
 	s := NewSeq(startFrom)
-	defer s.Stop()
 
 	assert.EqualValues(t, startFrom, s.GetCurrentValue())
 }
 
 func Test2_GetNextValue(t *testing.T) {
 	s := NewSeq(startFrom)
-	defer s.Stop()
 
-	assert.EqualValues(t, startFrom+incrementWith, s.IncrementValue(incrementWith))
+	s.IncrementValue(incrementWith)
+	assert.EqualValues(t, startFrom+incrementWith, s.GetCurrentValue())
 }
 
 func Test3_Race(t *testing.T) {
+	s := NewSeq(startFrom)
+
 	var wg sync.WaitGroup
 	wg.Add(3)
 
-	s := NewSeq(1)
-	defer s.Stop()
-
 	go func() {
 		s.IncrementValue(incrementWith)
 		wg.Done()
@@ -44,19 +47,18 @@ func Test3_Race(t *testing.T) {
 	}()
 
 	go func() {
-		s.IncrementValue(incrementWith)
+		s.IncrementValue(0)
 		wg.Done()
 	}()
 	wg.Wait()
 
-	assert.EqualValues(t, startFrom+3*incrementWith, s.GetCurrentValue())
+	assert.EqualValues(t, startFrom+2*incrementWith, s.GetCurrentValue())
 }
 
 // go test -bench=.
-// Benchmark_WChannels-8   	 2808022	       400 ns/op	       0 B/op	       0 allocs/op
-func Benchmark_WChannels(b *testing.B) {
+// Benchmark_WAtomic-8   	177026658	         6.74 ns/op	       0 B/op	       0 allocs/op
+func Benchmark_WAtomic(b *testing.B) {
 	s := NewSeq(77)
-	defer s.Stop()
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

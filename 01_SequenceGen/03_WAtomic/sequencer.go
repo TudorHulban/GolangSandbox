@@ -4,12 +4,11 @@ Package sequence provides a sequence to start from.
 package sequence
 
 import (
-	"sync"
+	"sync/atomic"
 )
 
 // Sequence Structure holding the sequence value and locker for protection of operations.
 type Sequence struct {
-	m            sync.Mutex
 	currentValue int64
 }
 
@@ -27,8 +26,5 @@ func (s *Sequence) GetCurrentValue() int64 {
 
 // IncrementValue returns sequence value incremented with passed value.
 func (s *Sequence) IncrementValue(with int64) {
-	s.m.Lock()
-	defer s.m.Unlock()
-
-	s.currentValue = s.currentValue + with
+	atomic.AddInt64(&s.currentValue, with)
 }

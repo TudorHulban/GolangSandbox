@@ -56,10 +56,11 @@ func Test3_Race(t *testing.T) {
 }
 
 // go test -bench=.
-// Benchmark_WMutex-4   	45014132	        25.2 ns/op	       0 B/op	       0 allocs/op
+// Benchmark_WMutex-8   	70632560	        16.5 ns/op	       0 B/op	       0 allocs/op
 func Benchmark_WMutex(b *testing.B) {
 	s := NewSeq(77)
 
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		s.IncrementValue(1)
 	}
