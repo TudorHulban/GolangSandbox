@@ -22,4 +22,14 @@ func main() {
 		log.Println(x)
 	}
 	a3(s)
+	
+	// closure
+	addX := func(m int) func(int) int {
+		return func(n int) int {
+			return m + n
+		}
+	}
+
+	add5 := addX(5)
+	log.Println(add5(1)) // 6
 }
