@@ -356,6 +356,7 @@ https://medium.com/swlh/ultimate-golang-string-formatting-cheat-sheet-234ec92c97
 ```
 ## High Performance <a name="high"></a> ([Up](#top))
 ```html
+https://dave.cheney.net/high-performance-go-workshop/gophercon-2019.html
 https://github.com/dgryski/go-perfbook
 https://github.com/alecthomas/go_serialization_benchmarks
 https://developer20.com/using-sync-pool/index.html
