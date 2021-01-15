@@ -55,6 +55,7 @@ https://www.quora.com/Why-does-Go-avoid-inheritance-and-provides-first-class-sup
 ```
 ## Getting Started <a name="start"></a> ([Up](#top))
 ```html
+https://draft.dev/learn/technical-blogs/golang
 https://www.quora.com/What-is-the-best-advice-for-a-beginner-who-wants-to-learn-Golang-as-a-first-language
 http://devs.cloudimmunity.com/gotchas-and-common-mistakes-in-go-golang/
 https://dave.cheney.net/practical-go/presentations/qcon-china.html
@@ -261,6 +262,7 @@ https://semaphoreci.com/community/tutorials/building-and-testing-a-rest-api-in-g
 ```html
 https://medium.com/swlh/functional-pipe-in-go-1c755467fe14
 https://stackoverflow.com/questions/60102866/golang-trouble-understanding-a-function-as-a-receiver
+https://kinbiko.com/posts/2021-01-10-function-types-in-go/
 ```
 ## RDBMS <a name="rdbms"></a> ([Up](#top))
 ```html
