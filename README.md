@@ -66,6 +66,7 @@ https://docs.google.com/document/d/1yIAYmbvL3JxOKOjuCyon7JhW4cSv1wy5hC0ApeGMV9s/
 https://dev.to/seattledataguy/the-interview-study-guide-for-software-engineers-764
 https://12factor.net/
 https://itnext.io/tips-for-writing-self-documenting-code-e54a15e9de2
+https://ueokande.github.io/go-slice-tricks/
 ```
 ## Directory Structure <a name="directory"></a> ([Up](#top))
 ```
