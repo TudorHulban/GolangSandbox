@@ -281,6 +281,7 @@ https://medium.com/better-programming/deploy-a-full-stack-go-and-react-app-on-ku
 ## Pointers <a name="point"></a> ([Up](#top))
 ```html
 http://piotrzurek.net/2013/09/20/pointers-in-go.html
+https://www.youtube.com/watch?v=sTFJtxJXkaY
 ```
 ## Context <a name="ctx"></a> ([Up](#top))
 ```html
