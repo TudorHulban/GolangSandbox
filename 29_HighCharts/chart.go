@@ -14,6 +14,7 @@ import (
 
 const nodePath = "/home/tudi/.config/versions/node/v12.6.0/bin/highcharts-export-server"
 
+// ChartSerie - Structure used for variables to hold chart series.
 type ChartSerie struct {
 	Name  string    `json:"name"`
 	Type  string    `json:"type"` // spline, line, column
@@ -23,26 +24,28 @@ type ChartSerie struct {
 
 type Chart struct {
 	Title               string
-	Colors              []string
 	YAxisTitle          string
 	Width               int
-	goTemplatePath      string // path to go template
+	GoTemplatePath      string // path to go template
 	InterimJSONTemplate string // path to json config
-	RenderSettings      []string
 	ChartImage          string // path to png image file
-	Series              []*ChartSerie
 	PreparedSeries      string
+	Colors              []string
+	RenderSettings      []string
+	Series              []*ChartSerie
 	SupportedChartTypes map[string]struct{}
 }
 
 // NewChart - constructor
-func NewChart(pTitle, pYAxisTitle, pGoTemplatePath, pInterimJSON, pRenderTo string, pWidth int) *Chart {
-	instance := new(Chart)
-	instance.Title = pTitle
-	instance.YAxisTitle = pYAxisTitle
-	instance.goTemplatePath = pGoTemplatePath
-	instance.InterimJSONTemplate = pInterimJSON
-	instance.ChartImage = pRenderTo
+// TODO: add create config helper.
+func NewChart(title, yAxisTitle, goTemplatePath, interimJSON, renderTo string, width int) *Chart {
+	instance := Chart{
+		Title:               title,
+		YAxisTitle:          yAxisTitle,
+		GoTemplatePath:      goTemplatePath,
+		InterimJSONTemplate: interimJSON,
+		ChartImage:          renderTo,
+	}
 
 	// mapping chart types
 	instance.SupportedChartTypes = make(map[string]struct{})
@@ -51,7 +54,7 @@ func NewChart(pTitle, pYAxisTitle, pGoTemplatePath, pInterimJSON, pRenderTo stri
 	instance.SupportedChartTypes["column"] = struct{}{}
 
 	instance.prepareRenderSettings()
-	return instance
+	return &instance
 }
 
 // prepareRenderSettings - private
@@ -65,21 +68,22 @@ func (c *Chart) prepareRenderSettings() {
 	c.RenderSettings = append(c.RenderSettings, strconv.Itoa(c.Width))
 }
 
-func (c *Chart) AddSerie(pSerie *ChartSerie) error {
-	if len(pSerie.Name) == 0 {
+func (c *Chart) AddSerie(serie *ChartSerie) error {
+	if len(serie.Name) == 0 {
 		return errors.New("series error - no name")
 	}
-	if pSerie.YAxis != 0 {
+	if serie.YAxis != 0 {
 		return errors.New("series error - invalid y axis")
 	}
-	if len(pSerie.Data) == 0 {
+	if len(serie.Data) == 0 {
 		return errors.New("series error - no data")
 	}
-	_, exists := c.SupportedChartTypes[pSerie.Type]
-	if !exists {
+
+	if _, exists := c.SupportedChartTypes[serie.Type]; !exists {
 		return errors.New("series error - invalid serie type")
 	}
-	c.Series = append(c.Series, pSerie)
+
+	c.Series = append(c.Series, serie)
 	return nil
 }
 
@@ -87,10 +91,12 @@ func (c *Chart) AddSerie(pSerie *ChartSerie) error {
 func (c *Chart) prepareSeries() {
 	for _, v := range c.Series {
 		var b bytes.Buffer
+
 		j := json.NewEncoder(&b)
 		j.Encode(&v)
 		c.PreparedSeries = c.PreparedSeries + "," + b.String()
 	}
+
 	c.PreparedSeries = c.PreparedSeries[1:]
 	log.Println("prepared series:", c.PreparedSeries)
 }
@@ -99,39 +105,45 @@ func (c *Chart) renderTemplate() error {
 	if len(c.Series) == 0 {
 		return errors.New("no series")
 	}
-	t, errParse := template.ParseFiles(c.goTemplatePath)
+
+	t, errParse := template.ParseFiles(c.GoTemplatePath)
 	if errParse != nil {
 		log.Println("errParse:", errParse)
 		return errParse
 	}
+
 	f, errCreate := os.Create(c.InterimJSONTemplate)
-	defer f.Close()
 	if errCreate != nil {
 		log.Println("errCreate: ", errCreate)
 		return errCreate
 	}
-	errExec := t.Execute(f, c)
-	if errExec != nil {
+	defer f.Close()
+
+	if errExec := t.Execute(f, c); errExec != nil {
 		log.Println("errExec: ", errExec)
+		return errExec
 	}
-	return errExec
+
+	return nil
 }
 
 // RenderChart - series need to be included
 func (c *Chart) RenderChart() error {
-	errTemplate := c.renderTemplate()
-	if errTemplate != nil {
+	if errTemplate := c.renderTemplate(); errTemplate != nil {
 		return errTemplate
 	}
+
 	binary, errPath := exec.LookPath(nodePath)
 	if errPath != nil {
 		log.Println("look path error", errPath)
 		return errPath
 	}
+
 	errExec := syscall.Exec(binary, c.RenderSettings, os.Environ())
 	if errExec != nil {
 		log.Println("exec error", errExec)
 		return errExec
 	}
+
 	return nil
 }
