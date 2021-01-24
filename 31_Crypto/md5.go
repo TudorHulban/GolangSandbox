@@ -5,9 +5,10 @@ import (
 	"encoding/hex"
 )
 
-func createMD5(pString string) string {
-
+// createMD5 - Returns the MD5 of passed string.
+func createMD5(s string) string {
 	m := md5.New()
-	m.Write([]byte(pString))
+	m.Write([]byte(s))
+
 	return hex.EncodeToString(m.Sum(nil))
 }

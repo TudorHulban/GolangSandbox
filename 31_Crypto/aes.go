@@ -14,6 +14,9 @@ import (
 
 //https://gist.github.com/stupidbodo/601b68bfef3449d1b8d9
 
+// TODO: add unit testing.
+
+// EncryptAES - TODO: add comment
 func EncryptAES(key []byte, text string) (string, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -22,6 +25,7 @@ func EncryptAES(key []byte, text string) (string, error) {
 
 	msg := Pad([]byte(text))
 	ciphertext := make([]byte, aes.BlockSize+len(msg))
+
 	iv := ciphertext[:aes.BlockSize]
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
 		return "", err
@@ -30,10 +34,10 @@ func EncryptAES(key []byte, text string) (string, error) {
 	cfb := cipher.NewCFBEncrypter(block, iv)
 	cfb.XORKeyStream(ciphertext[aes.BlockSize:], []byte(msg))
 
-	finalMsg := removeBase64Padding(base64.URLEncoding.EncodeToString(ciphertext))
-	return finalMsg, nil
+	return removeBase64Padding(base64.URLEncoding.EncodeToString(ciphertext)), nil
 }
 
+// EncryptAES - TODO: add comment
 func DecryptAES(key []byte, text string) (string, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -84,12 +88,11 @@ func Pad(src []byte) []byte {
 }
 
 func Unpad(src []byte) ([]byte, error) {
-	length := len(src)
-	unpadding := int(src[length-1])
+	unpadding := int(src[len(src)-1])
 
-	if unpadding > length {
+	if unpadding > len(src) {
 		return nil, errors.New("unpad error. This could happen when incorrect encryption key is used")
 	}
 
-	return src[:(length - unpadding)], nil
+	return src[:(len(src) - unpadding)], nil
 }

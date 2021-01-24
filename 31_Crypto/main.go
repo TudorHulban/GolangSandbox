@@ -10,5 +10,6 @@ func main() {
 
 	aes, _ := EncryptAES(key, "xxxxxxxxxxxx")
 	msg, _ := DecryptAES(key, aes)
+
 	fmt.Println("message:", msg)
 }
