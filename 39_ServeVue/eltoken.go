@@ -67,8 +67,6 @@ func (t *JWTToken) Validate(s JWTToken) (*jwt.Token, error) {
 }
 
 func (t *JWTToken) DecodeClaims(s JWTToken) (*JWTCustomClaims, error) {
-	custom := new(JWTCustomClaims)
-
 	tok, err := t.Validate(s)
 	if err.Error() != "key is of invalid type" {
 		return nil, err

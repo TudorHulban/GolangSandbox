@@ -63,7 +63,7 @@ type Data struct {
 
 // steps follows an operational flow. should be immutable.
 func steps() map[int]string {
-	state = make(map[int]string, 10)
+	state := make(map[int]string, 10)
 
 	state[0] = "init"
 	state[1] = "chop"
@@ -86,33 +86,34 @@ func NewCSV(cfg CfgSimplify) (*Data, error) {
 	}
 
 	instance := new(Data)
-	instance.ProcessID = "D" + strconv.FormatInt(pProcessID, 10)
+	instance.ProcessID = "D" + strconv.FormatInt(processID, 10)
 	instance.InputCSV = pCSV
 	instance.InputPositions = pPositions
 	instance.SimplifyPositions = pSimplifyPositions
-	instance.ExportCSV = pExportCSV
+	instance.SimplifiedCSV = exportCSV
 	instance.ExportXLS = pExportXLS
 	instance.BasePosition = pBasePosition
 	instance.SimplifyTolerance = pSimpleTolerance
+
 	return instance, nil
 }
 
 /*
 NewStream is constructor type. Creates instance based on stream. Positions start from 0.
 */
-func NewStream(pProcessID int64, pStream [][]interface{}, pPositions, pSimplifyPositions []int, pExportCSV, pExportXLS string, pBasePosition int, pSimpleTolerance float64) (*Data, error) {
+func NewStream(processID int64, stream [][]interface{}, positions, simplifyPositions []int, exportCSV, exportXLS string, basePosition int, simpleTolerance float64) (*Data, error) {
 	if pBasePosition >= len(pPositions) {
 		return nil, errors.New("base position outside selected series")
 	}
 	instance := new(Data)
-	instance.ProcessID = "D" + strconv.FormatInt(pProcessID, 10)
-	instance.InputStream = pStream
-	instance.InputPositions = pPositions
-	instance.SimplifyPositions = pSimplifyPositions
-	instance.ExportCSV = pExportCSV
-	instance.ExportXLS = pExportXLS
-	instance.BasePosition = pBasePosition
-	instance.SimplifyTolerance = pSimpleTolerance
+	instance.ProcessID = "D" + strconv.FormatInt(processID, 10)
+	instance.InputStream = stream
+	instance.InputPositions = positions
+	instance.SimplifyPositions = simplifyPositions
+	instance.ExportCSV = exportCSV
+	instance.ExportXLS = exportXLS
+	instance.BasePosition = basePosition
+	instance.SimplifyTolerance = simpleTolerance
 	return instance, nil
 }
 
@@ -132,13 +133,13 @@ func (d *Data) Auto() error {
 	switch d.State {
 	case 0: // "init"
 		{
-			log.Println("state: ", d.ProcessID, state[d.State])
+			log.Println("state: ", d.State)
 			d.Init()
 			nextStep()
 		}
 	case 1: // "chop"
 		{
-			log.Println("state: ", state[d.State])
+			log.Println("state: ", d.State)
 			if len(d.InputStream) == 0 {
 				errChop := d.ChopCSV()
 				if errChop != nil {
@@ -154,7 +155,7 @@ func (d *Data) Auto() error {
 		}
 	case 2: // "remap"
 		{
-			log.Println("state: ", d.ProcessID, state[d.State])
+			log.Println("state: ", d.State)
 			errRemap := d.remapData()
 			if errRemap != nil {
 				d.errorList = append(d.errorList, errRemap)
@@ -164,7 +165,7 @@ func (d *Data) Auto() error {
 		}
 	case 3: // "exportcsv"
 		{
-			log.Println("state: ", d.ProcessID, state[d.State])
+			log.Println("state: ", d.State)
 			errCSV := d.ExportToCSV()
 			if errCSV != nil {
 				d.errorList = append(d.errorList, errCSV)
@@ -174,7 +175,7 @@ func (d *Data) Auto() error {
 		}
 	case 4: // "exportxls"
 		{
-			log.Println("state: ", d.ProcessID, state[d.State])
+			log.Println("state: ", d.State)
 			errXLS := d.ExportToXLS()
 			if errXLS != nil {
 				d.errorList = append(d.errorList, errXLS)
@@ -184,7 +185,7 @@ func (d *Data) Auto() error {
 		}
 	case 5: // "combine"
 		{
-			log.Println("state: ", d.ProcessID, state[d.State])
+			log.Println("state: ", d.State)
 			errCombine := d.Combiner()
 			if errCombine != nil {
 				log.Println("______________combine:", errCombine)
@@ -196,7 +197,7 @@ func (d *Data) Auto() error {
 		}
 	case 6: // "simplify"
 		{
-			log.Println("state: ", d.ProcessID, state[d.State])
+			log.Println("state: ", d.State)
 			errSimplify := d.simplify()
 			if errSimplify != nil {
 				d.errorList = append(d.errorList, errSimplify)

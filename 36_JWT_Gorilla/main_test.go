@@ -50,7 +50,8 @@ func TestHandleRestrictedRoutes(t *testing.T) {
 
 	fmt.Println("request: ", request)
 
-	if response, err := client.Do(request); err != nil {
+	response, err := client.Do(request)
+	if err != nil {
 		t.Error("NewRequest  error: ", err)
 	}
 

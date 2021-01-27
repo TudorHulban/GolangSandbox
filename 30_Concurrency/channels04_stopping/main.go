@@ -16,9 +16,9 @@ type workTask struct {
 
 func main() {
 	chIntegers := make(chan int)
-	chPause := make(chan bool)
-	chWork := make(chan bool)
-	chQuit := make(chan bool)
+	//chPause := make(chan bool)
+	//chWork := make(chan bool)
+	//chQuit := make(chan bool)
 
 	for {
 		ev, isOpen := <-chIntegers

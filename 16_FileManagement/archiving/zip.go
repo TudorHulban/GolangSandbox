@@ -29,7 +29,8 @@ func NewZip(logger *log.LogInfo) IArchive {
 
 // CompressFile Method compressing a file using zip method.
 func (z *Zip) CompressFile(filePath string) error {
-
+	// TODO: add logic
+	return nil
 }
 
 // fileExists Helper for checking if we receive specific error for file path.
@@ -49,12 +50,15 @@ func fileExists(filePath string) bool {
 func createFile(filePath string) (*os.File, func(), error) {
 	targetFile, err := os.Create(filePath + zipExtension)
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
 	defer targetFile.Close()
+
+	// TODO: add logic
+	return nil, nil, err
 }
 
-func ZipFile(aFilePath string) error {
+func ZipFile(filePath string) error {
 	zipWriter := zip.NewWriter(targetFile)
 	defer zipWriter.Close()
 
@@ -63,7 +67,7 @@ func ZipFile(aFilePath string) error {
 		return err
 	}
 
-	header.Name = filepath.Base(aFilePath)
+	header.Name = filepath.Base(filePath)
 	header.Method = zip.Deflate
 
 	fileWriter, err := zipWriter.CreateHeader(header)
@@ -71,11 +75,12 @@ func ZipFile(aFilePath string) error {
 		return err
 	}
 
-	file, err := os.Open(AFilePath)
+	file, err := os.Open(filePath)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
 	_, err = io.Copy(fileWriter, file)
+	return err
 }
