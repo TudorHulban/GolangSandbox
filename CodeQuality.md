@@ -1,6 +1,9 @@
 # Code Quality Review: App / Module Name
 ## Introduction
-Areas to review:
+### Code Style.
+### Code Standards.
+
+### Areas to review:
 1. satisfies functional requirements
 2. satisfies microservices philosophy
 3. code is written according to Go language style
