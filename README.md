@@ -232,6 +232,11 @@ https://medium.freecodecamp.org/what-i-learned-from-an-old-github-project-that-w
 ```html
 https://www.ssllabs.com/
 ```
+### Injection
+```html
+https://www.calhoun.io/what-is-sql-injection-and-how-do-i-avoid-it-in-go/
+```
+
 ## Linters, Code Analysis, Style <a name="lint"></a> ([Up](#top))
 Establishing good paradigms and consistent, accessible standards for writing clean code can help prevent developers from wasting many meaningless hours on trying to understand their own (or others') work.
 ### Clean Code
