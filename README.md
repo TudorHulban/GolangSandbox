@@ -180,6 +180,7 @@ https://www.captaincodeman.com/2015/03/05/dependency-injection-in-go-golang
 ```
 ## Concurrency <a name="conc"></a> ([Up](#top))
 ```html
+https://www.youtube.com/watch?utm_campaign=Go+Full-Stack&utm_medium=email&utm_source=Revue+newsletter&v=S-MaTH8WpOM
 https://blog.golang.org/race-detector
 http://blog.ralch.com/articles/golang-concurrency-patterns-context/ 
 https://www.ardanlabs.com/blog/2018/08/scheduling-in-go-part1.html
