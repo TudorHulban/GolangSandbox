@@ -7,10 +7,10 @@ import (
 	"net"
 )
 
-func handleConn(pConnection *net.Conn) {
-	defer (*pConnection).Close()
+func handleConn(conn *net.Conn) {
+	defer (*conn).Close()
 
-	reader := bufio.NewReader(*pConnection)
+	reader := bufio.NewReader(*conn)
 	for {
 		bytes, errReader := reader.ReadBytes(byte('\n'))
 		if errReader != nil {
@@ -19,18 +19,19 @@ func handleConn(pConnection *net.Conn) {
 			}
 			return
 		}
+
 		request := string(bytes)
 		log.Println("request: ", request)
+
 		resp, errWork := doWork(request)
 		if errWork != nil {
-			_, errWrite := (*pConnection).Write([]byte("try later" + "\n"))
-			if errWrite != nil {
+			if _, errWrite := (*conn).Write([]byte("try later" + "\n")); errWrite != nil {
 				log.Println("could not write on error:", errWrite)
 			}
 			continue
 		}
-		_, errWrite := (*pConnection).Write([]byte(resp + "\n"))
-		if errWrite != nil {
+
+		if _, errWrite := (*conn).Write([]byte(resp + "\n")); errWrite != nil {
 			log.Println("could not write response:", errWrite)
 		}
 		break // faster of course without closing and opening. chose to close conn for mock up

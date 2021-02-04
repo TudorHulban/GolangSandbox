@@ -4,11 +4,11 @@ import (
 	"log"
 )
 
-func (p *pool) AddWorker(pWorker worker) {
-	p.workers = append(p.workers, pWorker)
+func (p *pool) AddWorker(w worker) {
+	p.workers = append(p.workers, w)
 }
 
-func (p *pool) UpdateWorker(pWorker worker) {
+func (p *pool) UpdateWorker(w worker) {
 
 }
 

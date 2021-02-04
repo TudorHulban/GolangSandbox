@@ -20,8 +20,8 @@ type worker struct {
 }
 
 type pool struct {
-	workers    []worker
 	lastWorker int
+	workers    []worker
 }
 
 type httpMessage struct {
@@ -64,16 +64,17 @@ func handleURL(w http.ResponseWriter, r *http.Request) {
 	jstream.Encode(&resp)
 }
 
-func requestURL(pSocket, pURL string) (string, error) {
-	conn, _ := net.Dial("tcp", pSocket)
-	fmt.Fprintf(conn, pURL+"\n")
+func requestURL(socket, url string) (string, error) {
+	conn, _ := net.Dial("tcp", socket)
+	fmt.Fprintf(conn, url+"\n")
+
 	reply, errRecv := bufio.NewReader(conn).ReadString('\n')
 	log.Println("received: ", reply)
 	return reply, errRecv
 }
 
-func NewWorker(pSocket string) *worker {
-	instance := worker{}
-	instance.socket = pSocket
-	return &instance
+func NewWorker(sock string) *worker {
+	return &worker{
+		socket: sock,
+	}
 }

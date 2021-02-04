@@ -23,6 +23,7 @@ func main() {
 		log.Println("listener error: ", errListen)
 		os.Exit(1)
 	}
+
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
