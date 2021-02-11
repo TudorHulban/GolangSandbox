@@ -373,6 +373,7 @@ https://www.aaronraff.dev/blog/an-introduction-to-producing-and-consuming-kafka-
 ```
 ## AWS Lambdas <a name="lambda"></a> ([Up](#top))
 ```
+https://geekflare.com/aws-lambda-for-beginners/
 https://docs.aws.amazon.com/lambda/latest/dg/lambda-golang.html
 https://cloudnative.ly/lambdas-with-golang-a-technical-guide-6f381284897b
 ```
