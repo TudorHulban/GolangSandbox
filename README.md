@@ -371,6 +371,11 @@ https://dev.to/codenation/profiling-golang-applications-using-pprof-1c7o
 https://www.freecodecamp.org/news/how-i-investigated-memory-leaks-in-go-using-pprof-on-a-large-codebase-4bec4325e192/
 https://www.aaronraff.dev/blog/an-introduction-to-producing-and-consuming-kafka-messages-in-go
 ```
+### Protocol Buffers
+```html
+https://kpbird.medium.com/golang-serialize-struct-using-gob-part-1-e927a6547c00
+https://blog.golang.org/gob
+```
 ## AWS Lambdas <a name="lambda"></a> ([Up](#top))
 ```
 https://geekflare.com/aws-lambda-for-beginners/
