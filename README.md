@@ -375,6 +375,7 @@ https://www.aaronraff.dev/blog/an-introduction-to-producing-and-consuming-kafka-
 ```html
 https://kpbird.medium.com/golang-serialize-struct-using-gob-part-1-e927a6547c00
 https://blog.golang.org/gob
+https://appliedgo.net/networking/
 ```
 ## AWS Lambdas <a name="lambda"></a> ([Up](#top))
 ```
