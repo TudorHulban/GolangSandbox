@@ -219,6 +219,10 @@ https://www.youtube.com/watch?v=5o97pT9A1d4
 ```html
 https://ieftimov.com/post/golang-datastructures-linked-lists/
 ```
+### Trees
+```
+https://ieftimov.com/post/golang-datastructures-trees/
+```
 ## BlockChain <a name="block"></a> ([Up](#top))
 ```html
 https://medium.com/@mycoralhealth/code-your-own-blockchain-in-less-than-200-lines-of-go-e296282bcffc
