@@ -259,7 +259,7 @@ https://go-critic.github.io/overview.html
 ```
 ### Static Code Analysis (SCA)
 ```
-https://superhighway.dev/staticcheck-in-action```
+https://superhighway.dev/staticcheck-in-action
 ```
 ### Style
 ```
