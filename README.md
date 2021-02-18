@@ -267,6 +267,7 @@ https://medium.com/@dgryski/idiomatic-go-resources-966535376dba
 https://github.com/dgryski/awesome-go-style
 https://wiki.crdb.io/wiki/spaces/CRDB/pages/73072807/Git+Commit+Messages
 https://github.com/uber-go/guide/blob/master/style.md
+https://github.com/golang/go/wiki/CodeReviewComments#go-code-review-comments
 ```
 ## Tutorial Series <a name="tutorials"></a> ([Up](#top))
 ```html
