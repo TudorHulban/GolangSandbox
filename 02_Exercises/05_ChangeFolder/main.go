@@ -17,7 +17,7 @@ func main() {
 	input = append(input, "pwd")
 	input = append(input, "cd /lab/root/../dir")
 	input = append(input, "pwd")
-	input = append(input, "cd /lab/root/../dir/../..")
+	input = append(input, "cd /lab/root/../dir/../../x")
 	input = append(input, "pwd")
 	input = append(input, "cd /home")
 	input = append(input, "pwd")
@@ -56,6 +56,10 @@ func handlePathLogic(p string) string {
 	var result []string
 
 	for _, v := range elems {
+		if len(v) == 0 {
+			continue
+		}
+
 		if v == ".." {
 			result = result[:len(result)-1]
 
@@ -66,11 +70,16 @@ func handlePathLogic(p string) string {
 			if len(strings.Trim(result[0], " ")) == 0 {
 				result = []string{"/"}
 			}
+
 			continue
 		}
 
 		result = append(result, v)
 	}
 
-	return strings.Join(result, "/")
+	if result[0] == "/" {
+		return "/" + strings.Join(result[1:], "/")
+	}
+
+	return "/" + strings.Join(result, "/")
 }
