@@ -287,6 +287,7 @@ https://medium.com/@rocketlaunchr.cloud/canceling-mysql-in-go-827ed8f83b30
 ## CI / CD <a name="cicd"></a> ([Up](#top))
 ```html
 https://medium.com/@chemidy/create-the-smallest-and-secured-golang-docker-image-based-on-scratch-4752223b7324
+https://blog.alexellis.io/inject-build-time-vars-golang/
 ```
 ## Microservices <a name="micros"></a> ([Up](#top))
 ```html
@@ -351,10 +352,6 @@ https://curtisvermeeren.github.io/2017/09/14/Golang-Templates-Cheatsheet
 https://blog.maddevs.io/how-to-start-with-logging-in-golang-projects-part-1-3e3a708b75be
 https://dev-journal.in/2019/05/27/adding-uber-go-zap-logger-to-golang-project/
 https://engineering.grab.com/structured-logging
-```
-## CI/CD <a name="ci"></a> ([Up](#top))
-```html
-https://blog.alexellis.io/inject-build-time-vars-golang/
 ```
 ## Miscellaneous <a name="misc"></a> ([Up](#top))
 ```html
