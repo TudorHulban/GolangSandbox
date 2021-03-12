@@ -35,12 +35,3 @@ func Benchmark_Parse3(b *testing.B) {
 		parse3(a1, a2, sum)
 	}
 }
-
-// Benchmark_Parse4-8   	 4306646	       288 ns/op	     112 B/op	       4 allocs/op
-func Benchmark_Parse4(b *testing.B) {
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
-		parse4(a1, a2, sum)
-	}
-}

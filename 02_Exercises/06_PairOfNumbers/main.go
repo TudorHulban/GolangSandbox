@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"sort"
 )
 
 /*
@@ -29,7 +28,7 @@ func main() {
 	r1 := parse1(a1, a2, 4)
 	fmt.Println(r1)
 
-	r2 := parse4(a1, a2, 4)
+	r2 := parse2(a1, a2, 4)
 	fmt.Println(r2)
 }
 
@@ -87,58 +86,4 @@ func parse3(a1, a2 []int, n int) [][2]int {
 	}
 
 	return result
-}
-
-func parse4(a1, a2 []int, sum int) [][2]int {
-	sort.Ints(a1)
-	sort.Ints(a2)
-
-	var result [][2]int
-
-	loopTo := len(a1) - 1
-
-	for indexA1 := 0; indexA1 < loopTo; indexA1++ {
-		// trying to exit the loop as arrays are sorted.
-		// what is minimum element from second array that we should consider?
-		// the target is to update loopTo
-
-		fmt.Println(indexA1)
-
-		for indexA2 := len(a2) - 1; indexA2 == 0; indexA2-- {
-			fmt.Println(indexA2)
-
-			if a1[indexA1]+a2[indexA2] > sum {
-				j := indexA1
-
-				for j < loopTo-1 {
-					if a1[j] == a1[j+1] {
-						j++
-						continue
-					}
-
-					break
-				}
-
-				fmt.Println("before:", loopTo) //-- before: 11
-				loopTo = minInt(loopTo, indexA1+j+1)
-				fmt.Println("after:", loopTo) //-- after: 9
-			}
-		}
-
-		for _, v := range a2 {
-			if sum == a1[indexA1]+v {
-				result = append(result, [2]int{a1[indexA1], v})
-			}
-		}
-	}
-
-	return result
-}
-
-func minInt(x, y int) int {
-	if x < y {
-		return x
-	}
-
-	return y
 }
