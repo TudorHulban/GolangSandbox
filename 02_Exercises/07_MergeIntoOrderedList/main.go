@@ -16,7 +16,6 @@ item 4.
 
 var a1 = []int{1, 3, 5, 7}
 var a2 = []int{2, 4, 6, 8, 9}
-var result = []int{1, 2, 3, 4, 5, 6, 7, 8, 9}
 
 func main() {
 

@@ -5,18 +5,31 @@ import (
 )
 
 func TestLogic(t *testing.T) {
-	a := order2(a1, a2)
-
-	t.Log("order:", a)
-
-	if len(result) != len(a) {
-		t.FailNow()
+	cases := []struct {
+		description string
+		a1          []int
+		a2          []int
+		expected    []int
+	}{
+		{"minimum arrays 1", []int{1}, []int{2}, []int{1, 2}},
+		{"minimum arrays 2", []int{2}, []int{1}, []int{1, 2}},
+		{"diff sizes 1", []int{1}, []int{3, 4}, []int{1, 3, 4}},
+		{"diff sizes 2", []int{3, 4}, []int{1}, []int{1, 3, 4}},
+		{"diff positions", []int{1, 3, 5, 7}, []int{2, 4, 6, 8, 9}, []int{1, 2, 3, 4, 5, 6, 7, 8, 9}},
 	}
 
-	for i := range result {
-		if result[i] != a[i] {
-			t.Log(i, result[i], a[i])
+	for _, tc := range cases {
+		result := order2(tc.a1, tc.a2)
+
+		if len(result) != len(tc.expected) {
 			t.FailNow()
+		}
+
+		for i := range result {
+			if result[i] != tc.expected[i] {
+				t.Log(i, result[i], tc.expected[i])
+				t.FailNow()
+			}
 		}
 	}
 }
