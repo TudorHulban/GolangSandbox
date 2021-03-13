@@ -21,10 +21,20 @@ func TestLogic(t *testing.T) {
 	}
 }
 
+// Benchmark_Order1-8   	 5858282	       197 ns/op	      96 B/op	       2 allocs/op
 func Benchmark_Order1(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
 		order1(a1, a2)
+	}
+}
+
+// Benchmark_Order2-8   	 7419392	       159 ns/op	     120 B/op	       4 allocs/op
+func Benchmark_Order2(b *testing.B) {
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		order2(a1, a2)
 	}
 }
