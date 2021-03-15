@@ -11,7 +11,8 @@ func main() {
 
 	fmt.Println("Final bubble:", bubble(a))
 	fmt.Println("Final selection:", selection(a))
-	fmt.Println("Final insertion:", insertion(a))
+	fmt.Println("Final insertion:", insertion1(a))
+	fmt.Println("Final free style:", insertion2(a))
 }
 
 func bubble(a []int) []int {
@@ -41,7 +42,7 @@ func selection(a []int) []int {
 	return a
 }
 
-func insertion(a []int) []int {
+func insertion1(a []int) []int {
 	for i := 1; i < len(a); i++ {
 		j := i
 
@@ -52,6 +53,21 @@ func insertion(a []int) []int {
 
 			j = j - 1
 		}
+	}
+
+	return a
+}
+
+func insertion2(a []int) []int {
+	for i := 0; i < len(a)-1; i++ {
+		currentVal := a[i]
+		j := i - 1
+
+		for j >= 0 && a[j] > currentVal {
+			a[j+1] = a[j]
+			j--
+		}
+		a[j+1] = currentVal
 	}
 
 	return a
