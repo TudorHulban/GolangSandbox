@@ -14,6 +14,8 @@ type LinkedList struct {
 	Head *Node
 }
 
+var ErrorNotFound = errors.New("value was not found")
+
 func NewLinkedList(n *Node) *LinkedList {
 	return &LinkedList{
 		Head: n,
@@ -26,18 +28,35 @@ func (l *LinkedList) Prepend(n *Node) {
 }
 
 func (l *LinkedList) DeleteValue(v int) error {
+	if l.Head == nil {
+		return errors.New("empty list")
+	}
+
 	if l.Head.Data == v {
-		l.Head = l.Head.nextNode
-		return nil
+		if l.Head.nextNode != nil {
+			l.Head = l.Head.nextNode
+			return nil
+		}
+
+		l.Head = nil
+		return errors.New("empty list")
+	}
+
+	// if previous did not trigger the one value list does not have the value.
+	if l.Head.nextNode == nil {
+		return ErrorNotFound
 	}
 
 	next := l.Head
 
 	for next.nextNode.Data != v {
 		if next.nextNode.nextNode == nil {
-			return errors.New("value was not found")
+			return ErrorNotFound
 		}
 
+		if next.nextNode == nil {
+			return errors.New("stopping , only head remains")
+		}
 		next = next.nextNode
 	}
 
@@ -78,6 +97,14 @@ func main() {
 	l.PrintData()
 
 	l.DeleteValue(3)
+	l.PrintData()
+
+	l.DeleteValue(2)
+	l.PrintData()
+
+	fmt.Println(l.DeleteValue(4))
+
+	l.DeleteValue(1)
 	l.PrintData()
 
 	fmt.Println(l.DeleteValue(4))
