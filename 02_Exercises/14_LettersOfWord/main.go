@@ -47,6 +47,7 @@ func main() {
 func deleteOne(s string, res *map[string]bool) {
 	if len(s) == 1 {
 		(*res)[s] = true
+		return
 	}
 
 	for i := 0; i < len(s); i++ {
