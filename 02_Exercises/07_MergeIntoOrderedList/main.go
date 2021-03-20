@@ -12,6 +12,8 @@ The lists might have different length.
 Resources: https://adaickalavan.github.io/portfolio/coding-questions-in-golang/#findPair&gsc.tab=0
 item 4.
 
+What about median calculation for result?
+
 */
 
 var a1 = []int{1, 3, 5, 7}
@@ -48,4 +50,13 @@ func order2(a1, a2 []int) []int {
 	}
 
 	return append(result, a2[indexA2:]...)
+}
+
+func median(a []int) float64 {
+	if len(a)%2 == 0 {
+		middle := len(a)/2 - 1
+		return float64((a[middle] + a[middle+1])) / 2
+	}
+
+	return float64(a[len(a)/2])
 }
