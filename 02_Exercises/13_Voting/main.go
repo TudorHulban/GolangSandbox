@@ -18,6 +18,12 @@ import (
 	"sort"
 )
 
+// MapData Exported for future use.
+type MapData struct {
+	Key   rune
+	Value int
+}
+
 func main() {
 	s := "abcd" // every letter is a vote. if maximum number votes twice, no winner
 
@@ -36,6 +42,27 @@ func identifyEl(s string) map[rune]int {
 
 		result[v] = 1
 	}
+
+	return result
+}
+
+func orderMapData(m map[rune]int) []MapData {
+	if len(m) == 0 {
+		return []MapData{}
+	}
+
+	var result []MapData
+
+	for k, v := range m {
+		result = append(result, MapData{
+			Key:   k,
+			Value: v,
+		})
+	}
+
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].Value < result[j].Value
+	})
 
 	return result
 }
