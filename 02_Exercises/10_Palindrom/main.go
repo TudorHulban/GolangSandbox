@@ -7,6 +7,8 @@ A palindrome is a word, number, phrase, or other
 sequence of characters which reads the same backward as forward,
 such as madam or racecar.
 
+ex. `tenet`, `aa`
+
 */
 
 import (
@@ -23,11 +25,6 @@ func main() {
 
 func check(s string) bool {
 	l := len(s)
-
-	if l%2 == 0 {
-		return false
-	}
-
 	half := l / 2
 
 	h1 := s[:half]
