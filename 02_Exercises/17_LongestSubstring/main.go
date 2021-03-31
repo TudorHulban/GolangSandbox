@@ -17,16 +17,16 @@ func main() {
 func walkString(s string) string {
 	substrings := getAllSubstrings(s)
 
-	sort.Slice(substrings, func(i, j int) bool {
-		if len(substrings[i]) > 0 && len(substrings[j]) > 0 {
-			// orders alphabetically
-			return (len(substrings[i]) > len(substrings[j])) && ([]rune(substrings[i])[0] < []rune(substrings[j])[0])
-		}
+	// fmt.Println("Unsorted: ", substrings)
 
-		return (len(substrings[i]) > len(substrings[j]))
+	sort.Slice(substrings, func(i, j int) bool {
+		// orders alphabetically
+		// ([]rune(substrings[i])[0] < []rune(substrings[j])[0])
+
+		return (len(substrings[i]) >= len(substrings[j]))
 	})
 
-	fmt.Println(substrings)
+	// fmt.Println("Sorted: ", substrings)
 
 	for _, v := range substrings {
 		if noRepeating(v) {
@@ -37,11 +37,12 @@ func walkString(s string) string {
 	return ""
 }
 
+// brute force
 func getAllSubstrings(s string) []string {
 	result := []string{}
 
 	for i := 0; i < len(s); i++ {
-		for j := i; j <= len(s); j++ {
+		for j := i + 1; j <= len(s); j++ {
 			result = append(result, s[i:j])
 		}
 	}
