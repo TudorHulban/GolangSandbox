@@ -347,6 +347,7 @@ https://goinbigdata.com/example-of-using-templates-in-golang/
 https://golangtutorials.blogspot.com/2011/06/go-templates.html
 https://curtisvermeeren.github.io/2017/09/14/Golang-Templates-Cheatsheet
 https://www.calhoun.io/intro-to-templates-p3-functions/
+https://philipptanlak.com/web-frontends-in-go/
 ```
 ## Logging <a name="log"></a> ([Up](#top))
 ```html
