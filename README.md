@@ -67,6 +67,7 @@ https://dev.to/seattledataguy/the-interview-study-guide-for-software-engineers-7
 https://12factor.net/
 https://itnext.io/tips-for-writing-self-documenting-code-e54a15e9de2
 https://ueokande.github.io/go-slice-tricks/
+https://bitfieldconsulting.com/golang/commandments
 ```
 ## Directory Structure <a name="directory"></a> ([Up](#top))
 ```
