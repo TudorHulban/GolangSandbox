@@ -1,0 +1,5 @@
+<!-- index.html -->
+Hi {{.}}!
+
+{{range $fruit := .Data}}
+{{$fruit}} is{{if isChosen $fruit}} very{{end}} sweet!{{end}}
