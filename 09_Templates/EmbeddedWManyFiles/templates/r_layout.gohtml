@@ -1,0 +1,15 @@
+<!-- layout.html -->
+<html>
+    <body>
+        <div class="navbar">...</div>
+         <div class="isadmin">
+            {{block "admin" .}}
+            {{end}}
+        </div>
+        
+        <div class="content">
+            {{block "profile" .}}
+            {{end}}
+        </div>
+    </body>
+</html>
