@@ -206,6 +206,7 @@ https://stackoverflow.com/questions/39092925/why-are-interfaces-needed-in-golang
 https://medium.com/better-programming/how-i-build-robust-scalable-go-applications-192a0df32d1
 https://www.efekarakus.com/golang/2019/12/29/working-with-interfaces-in-go.html
 https://medium.com/@matryer/golang-advent-calendar-day-seventeen-io-reader-in-depth-6f744bb4320b
+https://www.pixelstech.net/article/1588481241-How-to-check-whether-a-struct-implements-an-interface-in-GoLang
 ```
 ## Data Structures and Algorithms <a name="structs"></a> ([Up](#top))
 ### Arrays
