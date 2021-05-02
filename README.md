@@ -69,6 +69,10 @@ https://itnext.io/tips-for-writing-self-documenting-code-e54a15e9de2
 https://ueokande.github.io/go-slice-tricks/
 https://bitfieldconsulting.com/golang/commandments
 ```
+### Multiple versions
+```html
+https://www.pixelstech.net/article/1573366500-Maintain-multiple-versions-of-Go-in-one-single-environment
+```
 ## Directory Structure <a name="directory"></a> ([Up](#top))
 ```
 https://medium.com/dm03514-tech-blog/go-aws-lambda-project-structure-using-golang-98b6c0a5339d
