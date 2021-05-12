@@ -1,15 +1,12 @@
 package main
 
 import (
-	"flag"
 	"html/template"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/websocket"
 )
-
-var addr = flag.String("addr", "localhost:8080", "http service address")
 
 var upgrader = websocket.Upgrader{} // use default options
 
@@ -22,7 +19,7 @@ func echo(w http.ResponseWriter, r *http.Request) {
 	defer conn.Close()
 
 	for {
-		mt, message, err := conn.ReadMessage()
+		messageType, message, err := conn.ReadMessage()
 		if err != nil {
 			go log.Println("read:", err)
 			break
@@ -30,7 +27,7 @@ func echo(w http.ResponseWriter, r *http.Request) {
 
 		go log.Printf("recived message: %s", message)
 
-		errWriteBack := conn.WriteMessage(mt, message)
+		errWriteBack := conn.WriteMessage(messageType, message)
 		if errWriteBack != nil {
 			go log.Println("write:", errWriteBack)
 			break
@@ -43,11 +40,10 @@ func home(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	flag.Parse()
-	log.SetFlags(0)
 	http.HandleFunc("/echo", echo)
 	http.HandleFunc("/", home)
-	log.Fatal(http.ListenAndServe(*addr, nil))
+
+	log.Fatal(http.ListenAndServe(":7000", nil))
 }
 
 var homeTemplate = template.Must(template.New("").Parse(`
@@ -57,7 +53,6 @@ var homeTemplate = template.Must(template.New("").Parse(`
 <meta charset="utf-8">
 <script>  
 window.addEventListener("load", function(evt) {
-
     var output = document.getElementById("output");
     var input = document.getElementById("input");
     var ws;
@@ -120,7 +115,7 @@ You can change the message and send multiple times.
 <form>
 <button id="open">Open</button>
 <button id="close">Close</button>
-<p><input id="input" type="text" value="Hello world!">
+<p><input id="input" type="text" value="Hola!">
 <button id="send">Send</button>
 </form>
 </td><td valign="top" width="50%">
