@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"sync"
 
 	"github.com/gorilla/websocket"
 )
@@ -24,6 +25,8 @@ type Client struct {
 	send      chan []byte
 	stop      chan struct{}
 	interrupt chan os.Signal
+
+	m *sync.Mutex
 }
 
 const urlBinance = "wss://stream.binance.com:9443/ws/bnbusdt@trade"
@@ -48,35 +51,32 @@ func NewClient(cfg Config) (*Client, error) {
 		send:       make(chan []byte),
 		stop:       make(chan struct{}),
 		interrupt:  interrupt,
+		m:          &sync.Mutex{},
 	}, nil
 }
 
 func (c *Client) ReadMessages() {
 	defer c.cleanUp()
 
-	var shouldStop bool
-
-	checkSignals := func() {
+loop:
+	for {
 		select {
 		case <-c.interrupt:
 			{
 				log.Println("interrupt")
-				shouldStop = true
+				break loop
+			}
+		default:
+			{
+				_, message, errRead := c.connection.ReadMessage()
+				if errRead != nil {
+					log.Println("read glitch:", errRead)
+					return
+				}
+
+				go log.Printf("received message: %s", message)
 			}
 		}
-	}
-
-	go checkSignals()
-
-	for !shouldStop {
-		_, message, errRead := c.connection.ReadMessage()
-		if errRead != nil {
-			log.Println("read glitch:", errRead)
-			return
-		}
-
-		go log.Printf("received message: %s", message)
-
 	}
 
 	c.stop <- struct{}{}
