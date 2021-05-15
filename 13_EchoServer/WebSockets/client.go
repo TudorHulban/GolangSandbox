@@ -11,16 +11,12 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func socksConnection(requestHeader http.Header) (*websocket.Conn, *http.Response, error) {
-	u := url.URL{
-		Scheme: "ws",
-		Host:   "localhost:8080",
-		Path:   "/echo",
-	}
+const urlBinance = "wss://stream.binance.com:9443/ws/bnb@kline_1m"
 
-	log.Printf("connecting to %s", u.String())
+func webSocketConnection(requestHeader http.Header, url *url.URL) (*websocket.Conn, *http.Response, error) {
+	log.Printf("connecting to %s", url.String())
 
-	return websocket.DefaultDialer.Dial(u.String(), nil)
+	return websocket.DefaultDialer.Dial(url.String(), nil)
 }
 
 func readingMessages(connection *websocket.Conn, stop chan struct{}) {
@@ -37,7 +33,7 @@ func readingMessages(connection *websocket.Conn, stop chan struct{}) {
 	}
 }
 
-func sendingMessages(connection *websocket.Conn, data chan string, interrupt chan os.Signal, stop chan struct{}) {
+func sendingMessages(connection *websocket.Conn, messages <-chan string, interrupt chan os.Signal, stop chan struct{}) {
 	for {
 		select {
 		case <-stop:
@@ -45,7 +41,7 @@ func sendingMessages(connection *websocket.Conn, data chan string, interrupt cha
 				return
 			}
 
-		case msg := <-data:
+		case msg := <-messages:
 			{
 				err := connection.WriteMessage(websocket.TextMessage, []byte(msg))
 				if err != nil {
@@ -71,17 +67,27 @@ func sendingMessages(connection *websocket.Conn, data chan string, interrupt cha
 
 				return
 			}
-
 		}
-
 	}
 }
 
 func main() {
-	conn, _, errConnect := socksConnection(nil)
+	// u := url.URL{
+	// 	Scheme: "ws",
+	// 	Host:   "localhost:7000",
+	// 	Path:   "/echo",
+	// }
+
+	u, errParse := url.Parse(urlBinance)
+	if errParse != nil {
+		log.Println("read:", errParse)
+		os.Exit(1)
+	}
+
+	conn, _, errConnect := webSocketConnection(nil, u)
 	if errConnect != nil {
 		log.Println("read:", errConnect)
-		os.Exit(1)
+		os.Exit(2)
 	}
 
 	data := make(chan string)
