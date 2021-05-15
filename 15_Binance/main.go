@@ -89,4 +89,5 @@ func main() {
 
 	<-c.stop
 	close(c.stop)
+	close(c.interrupt)
 }
