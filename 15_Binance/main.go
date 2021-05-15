@@ -1,12 +1,11 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 	"net/url"
 	"os"
 	"os/signal"
-	"sync"
 
 	"github.com/gorilla/websocket"
 )
@@ -22,11 +21,8 @@ type Client struct {
 	connection *websocket.Conn
 	URL        url.URL
 
-	send      chan []byte
 	stop      chan struct{}
 	interrupt chan os.Signal
-
-	m *sync.Mutex
 }
 
 const urlBinance = "wss://stream.binance.com:9443/ws/bnbusdt@trade"
@@ -48,43 +44,34 @@ func NewClient(cfg Config) (*Client, error) {
 	return &Client{
 		connection: conn,
 		URL:        *url,
-		send:       make(chan []byte),
 		stop:       make(chan struct{}),
 		interrupt:  interrupt,
-		m:          &sync.Mutex{},
 	}, nil
 }
 
 func (c *Client) ReadMessages() {
-	defer c.cleanUp()
-
 loop:
 	for {
 		select {
 		case <-c.interrupt:
 			{
-				log.Println("interrupt")
+				fmt.Println("interrupt")
 				break loop
 			}
 		default:
 			{
 				_, message, errRead := c.connection.ReadMessage()
 				if errRead != nil {
-					log.Println("read glitch:", errRead)
+					fmt.Println("read glitch:", errRead)
 					return
 				}
 
-				go log.Printf("received message: %s", message)
+				go fmt.Println(string(message))
 			}
 		}
 	}
 
 	c.stop <- struct{}{}
-}
-
-func (c *Client) cleanUp() {
-	close(c.stop)
-	close(c.send)
 }
 
 func main() {
@@ -94,11 +81,12 @@ func main() {
 
 	c, errNew := NewClient(cfg)
 	if errNew != nil {
-		log.Println(errNew)
+		fmt.Println(errNew)
 		os.Exit(1)
 	}
 
 	go c.ReadMessages()
 
 	<-c.stop
+	close(c.stop)
 }
