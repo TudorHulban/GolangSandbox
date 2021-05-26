@@ -31,6 +31,19 @@ func scrape() {
 	doc.Find("button").Each(func(i int, s *goquery.Selection) {
 		fmt.Println(i, s.Text())
 	})
+	
+	nodes := doc.Find("div .top10 a").Nodes
+
+	for _, node := range nodes {
+		links := node.Attr
+
+		for _, link := range links {
+			if strings.Contains(link.Val, "sql") {
+				fmt.Println(link)
+				break
+			}
+		}
+	}
 }
 
 func main() {
