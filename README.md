@@ -336,6 +336,7 @@ https://blog.codecentric.de/en/2017/08/gomock-tutorial/
 https://dave.cheney.net/2019/05/07/prefer-table-driven-tests
 https://apitest.dev/
 https://golang.testcontainers.org/
+https://ieftimov.com/post/testing-in-go-dependency-injection/
 ```
 ### Integration Testing
 ```
